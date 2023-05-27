@@ -1,0 +1,638 @@
+<!doctype html>
+<html class="no-js" lang="zxx">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>医院感染信息监测系统 </title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Place favicon.ico in the root Internist, General Practitonery -->
+
+    <!-- CSS here -->
+    <link rel="stylesheet" href="../../css/bootstrap.min.css">
+    <link rel="stylesheet" href="../../css/animate.min.css">
+    <link rel="stylesheet" href="../../css/magnific-popup.css">
+    <link rel="stylesheet" href="../../fontawesome/css/all.min.css">
+    <link rel="stylesheet" href="../../css/dripicons.css">
+    <link rel="stylesheet" href="../../css/slick.css">
+    <link rel="stylesheet" href="../../css/default.css">
+    <link rel="stylesheet" href="../../css/meanmenu.css">
+    <link rel="stylesheet" href="../../css/style.css">
+
+
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <script src="/js/jquery-3.3.1.min.js"></script>
+    <script src="/js/vue.min.js"></script>
+    <script src="/js/axios.js"></script>
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+
+
+    <link rel="stylesheet" href="../../css/responsive.css">
+    <style type="text/css">
+        .user {
+            display: inline;
+        }
+
+        .patient {
+            width: 350px;
+            /* height: 400px; */
+            background-color: #D9E6F5;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /*动画加载*/
+        .loading {
+            position: fixed;
+            left: 0;
+            top: 0;
+            /*background: url('/img/three-dots.svg') center center no-repeat #fff;*/
+            background-color: white;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1000;
+            /*opacity: 0.8;*/
+        }
+
+        .main {
+            height: 100px;
+            width: 100px;
+            margin: 200px auto
+        }
+
+        .main div {
+            color: #799761;
+            margin: 50px auto;
+        }
+
+        svg {
+            fill: none
+        }
+
+        .load {
+            stroke-width: 15px;
+            stroke-dasharray: 252;
+            stroke-dashoffset: 0;
+            animation: load 1.5s ease-in-out infinite;
+            transform-origin: center center
+
+        }
+
+        .one {
+            stroke: #b8d8d7;
+        }
+
+        .two {
+            stroke: #73c0b0;
+            animation-delay: 0.1s;
+        }
+
+        .three {
+            stroke: #4d8f8e;
+            animation-delay: 0.2s
+        }
+
+        @keyframes load {
+            0%, 100% {
+                stroke-dashoffset: 252
+            }
+            50% {
+                stroke-dashoffset: 230
+            }
+            100% {
+                transform: rotate(360deg)
+            }
+        }
+
+        .jump {
+            animation: jump 0.5s ease-in-out infinite
+        }
+
+        .first {
+            fill: #b8d8d7;
+        }
+
+        .second {
+            fill: #73c0b0;
+            animation-delay: 0.1s;
+        }
+
+        .third {
+            fill: #4d8f8e;
+            animation-delay: 0.2s;
+        }
+
+        @keyframes jump {
+            0%, 100% {
+                transform: translateY(0)
+            }
+            50% {
+                transform: translateY(-10px)
+            }
+        }
+
+        .second-menu .main-menu ul li:nth-child(2) {
+            border-bottom: #0b3e6f 3px solid;
+        }
+
+        .breadcrumb-area {
+            min-height: 100px !important;
+        }
+
+        .patient {
+            background-color: #2C85D7;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+<!-- header -->
+<div class="headerpage_m"></div>
+<!-- header-end -->
+<!-- main-area -->
+<main id="dcims">
+    <!-- breadcrumb-area -->
+    <!--            <section class="breadcrumb-area d-flex align-items-center" style="background-image:url(../../img/testimonial/test-bg.jpg)">-->
+    <section class="breadcrumb-area d-flex align-items-center" style="background-color: #D9E6F5">
+        <div class="container">
+            <div style="width: 50%;margin: 0px auto">
+                <h2 style="margin-top: 20px" align="center">收集报卡</h2>
+            </div>
+        </div>
+    </section>
+
+    <!-- shop-area -->
+    <section class="shop-area pt-120 pb-120 p-relative wow fadeInUp animated" data-animation="fadeInUp animated"
+             data-delay=".2s" style="padding-top: 50px">
+        <div class="container">
+            <div v-if="isLoading" class="loading">
+                <div class="main">
+                    <svg viewBox="0 0 120 120">
+                        <circle class="load one" cx="60" cy="60" r="40"></circle>
+                        <circle class="load two" cx="60" cy="60" r="40"></circle>
+                        <circle class="load three" cx="60" cy="60" r="40"></circle>
+                        <circle class="jump first" cx="45" cy="60" r="5"></circle>
+                        <circle class="jump second" cx="60" cy="60" r="5"></circle>
+                        <circle class="jump third" cx="75" cy="60" r="5"></circle>
+                    </svg>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-6 col-sm-6">
+                    <h6 class="mt-20 mb-30">病人信息</h6>
+                </div>
+                <div class="col-lg-6 col-sm-6 text-right">
+                    <select name="orderby" class="orderby" aria-label="Shop order" v-model="diagnosisTypeNo"
+                            @change="getInfo">
+                        <option :value="item.diagnosisTypeNo" v-for="item in diagnosis">{{item.diagnosisTypeName}}
+                        </option>
+                    </select>
+                    <select name="orderby" class="orderby" aria-label="Shop order" v-model="handleAction"
+                            @change="getInfo">
+                        <option value="-1">查询全部</option>
+                        <option value="3">未处理</option>
+                        <option value="2">疑似状态</option>
+                        <option value="1">预警状态</option>
+                        <option value="0">排除状态</option>
+                    </select>
+                    <select name="orderby" class="orderby" aria-label="Shop order" v-model="status1" @change="getInfo">
+                        <option value="0">查询全部</option>
+                        <option value="1">查询最新报卡</option>
+                    </select>
+                    <div class="block">
+                        <el-date-picker
+                                v-model="upTime"
+                                type="daterange"
+                                align="right"
+                                unlink-panels
+                                range-separator="至"
+                                start-placeholder="开始日期"
+                                end-placeholder="结束日期"
+                                :picker-options="pickerOptions">
+                        </el-date-picker>
+                    </div>
+                </div>
+            </div>
+            <div class="align-items-center" style="text-align: center;margin: 0px auto">
+                <div class="col-lg-12 col-md-12" v-if="reportCards.length==0">
+                    <div class="product mb-40">
+                        <div class="product__img">
+                            <!-- <a href="shop-details.html"><img src="img/shop/img4.jpg" alt=""></a> -->
+                            <div class="patient card" style="text-align:center;margin: 0px auto;width: 80%;">
+                                暂无数据
+                            </div>
+                        </div>
+                    </div>
+                </div><!--class="col-lg-4 col-md-6"-->
+                <div v-else style="display:inline-block;width: 360px;height: 641px"
+                     v-for="reportCardOne in reportCards.slice((currentPage-1)*pagesize,currentPage*pagesize)">
+                    <div class="product mb-40">
+                        <div class="product__img">
+                            <!-- <a href="shop-details.html"><img src="img/shop/img4.jpg" alt=""></a> -->
+                            <div class="patient card">
+                                <div class="card-header">{{reportCardOne.patientinfo.name}}</div>
+                                <div class="card-body">
+                                    <p><span>医生:</span><span>{{reportCardOne.mainDoctor.doctorName}}</span></p>
+                                    <p><span>入院时间:</span><span>{{reportCardOne.patientinfo.enterTimeStr}}</span></p>
+                                    <p><span>预警时间:</span><span>{{reportCardOne.warnDate || "无"}}</span></p>
+                                    <p><span>处理时间:</span><span>{{reportCardOne.handleDate || "无"}}</span></p>
+                                    <p><span>上报时间:</span><span>{{reportCardOne.upTime}}</span></p>
+                                    <p><span>社区感染:</span>
+                                        <font v-if="reportCardOne.cstatus==0"
+                                              color="#0000FF">{{reportCardOne.cstatusStr}}</font>
+                                        <font v-else-if="reportCardOne.cstatus==1"
+                                              color="#FF0000">{{reportCardOne.cstatusStr}}</font>
+                                    </p>
+                                    <p><span>床号:</span><span>{{reportCardOne.patientinfo.bedNumber}}</span></p>
+                                    <p><span>电话:</span><span>{{reportCardOne.patientinfo.phone}}</span></p>
+                                </div>
+                                <div class="card-footer">
+                                    <span>诊断类型:<span>{{reportCardOne.diagnosisType.diagnosisTypeName}}</span></span>
+                                    <span>报卡状态:
+                                                        <span v-if="reportCardOne.handleAction==0">已排除</span>
+                                                        <span v-else-if="reportCardOne.handleAction==1">已预警</span>
+                                                        <span v-else-if="reportCardOne.handleAction==2">怀疑中</span>
+                                                        <span v-else="reportCardOne.handleAction==3">未处理</span>
+                                                    </span>
+                                </div>
+                            </div>
+                            <div class="product-action text-center">
+                                <a v-show="reportCardOne.handleAction==3" href="#"
+                                   @click="suspected(reportCardOne)">疑似</a>
+                                <a v-show="reportCardOne.handleAction==2" href="#" @click="handle(reportCardOne)">预警</a>
+                                <a v-show="reportCardOne.handleAction==2" href="#" @click="elimi1(reportCardOne)">排除</a>
+                            </div>
+
+                        </div>
+                        <div class="product__content text-center pt-30">
+                            <h4 class="user">上报人：</h4>
+                            <span class="user">{{reportCardOne.doctor.doctorName}}</span>
+                        </div>
+                        <div class="product__content text-center pt-30">
+                            <h4 class="user">处理人：</h4>
+                            <span class="user">{{reportCardOne.handleUser == null ? "暂无" : reportCardOne.handleUser.name}}</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <div class="pagination-wrap mt-50 text-center">
+                        <div style="text-align: center;margin-top: 30px;">
+                            <el-pagination
+                                    :page-size="pagesize"
+                                    background
+                                    layout="prev, pager, next"
+                                    :total="total"
+                                    @current-change="current_change">
+                            </el-pagination>
+                        </div>
+                    </div>
+                </div>
+                <div></div>
+            </div>
+        </div>
+    </section>
+    <!-- shop-area-end -->
+    <el-dialog title="排除" :show-close="false" :visible.sync="dialogFormVisible">
+        <el-form :model="elimiData">
+            <el-form-item label="内容" :label-width="formLabelWidth">
+                <el-input v-model="elimiData.content" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="排除原因" :label-width="formLabelWidth">
+                <el-input v-model="elimiData.cause" auto-complete="off"></el-input>
+            </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="dialogFormVisible = false">取 消</el-button>
+            <el-button type="primary" @click="elimi">确 定</el-button>
+        </div>
+    </el-dialog>
+    <el-dialog title="预警" :show-close="false" :visible.sync="warndialogFormVisible">
+        <el-form :model="warnInfo">
+            <el-form-item label="预警条件" :label-width="formLabelWidth">
+                <el-select v-model="warnInfo.conditionNo" placeholder="请选择">
+                    <el-option
+                            v-for="item in warnconditions"
+                            :key="item.conditionNo"
+                            :label="item.conditionName"
+                            :value="item.conditionNo">
+                    </el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="预警类型" :label-width="formLabelWidth">
+                <el-select v-model="warnInfo.warnTypeNo" placeholder="请选择">
+                    <el-option
+                            v-for="item in warnTypes"
+                            :key="item.warnTypeNo"
+                            :label="item.warnTypeName"
+                            :value="item.warnTypeNo">
+                    </el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="预警内容" :label-width="formLabelWidth">
+                <el-input v-model="warnInfo.warnContent" auto-complete="off"></el-input>
+            </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="warndialogFormVisible = false">取 消</el-button>
+            <el-button type="primary" @click="warn">确 定</el-button>
+        </div>
+    </el-dialog>
+</main>
+<!-- main-area-end -->
+<!-- footer -->
+
+<!-- footer-end -->
+<div class="footerpage_m"></div>
+
+<!-- JS here -->
+<!-- JS here -->
+<script src="../../js/vendor/modernizr-3.5.0.min.js"></script>
+<script src="../../js/vendor/jquery-1.12.4.min.js"></script>
+<script src="../../js/popper.min.js"></script>
+<script src="../../js/bootstrap.min.js"></script>
+<script src="../../js/one-page-nav-min.js"></script>
+<script src="../../js/jquery.meanmenu.min.js"></script>
+<script src="../../js/slick.min.js"></script>
+<script src="../../js/ajax-form.js"></script>
+<script src="../../js/paroller.js"></script>
+<script src="../../js/wow.min.js"></script>
+<script src="../../js/js_isotope.pkgd.min.js"></script>
+<script src="../../js/imagesloaded.min.js"></script>
+<script src="../../js/parallax.min.js"></script>
+<script src="../../js/jquery.waypoints.min.js"></script>
+<script src="../../js/jquery.counterup.min.js"></script>
+<script src="../../js/jquery.scrollUp.min.js"></script>
+<script src="../../js/parallax-scroll.js"></script>
+<script src="../../js/jquery.magnific-popup.min.js"></script>
+<script src="../../js/element-in-view.js"></script>
+<script src="../../js/main.js"></script>
+<script>
+    $(function () {
+        //调用公共代码
+        $('.footerpage_m').load('/commons/footer.html');
+        $('.headerpage_m').load('/commons/header.html');
+
+        $(".exit").click(function logout() {
+            $.ajax({
+                type: "post",
+                url: "/logout",
+                dataType: "json",
+                data: {},
+                success: function (res) {
+                    if (res.code == 200) {
+                        window.location.href = "http://192.168.150.130:8089/pages/login.html";
+                    } else {
+                        alert("退出失败")
+                    }
+                }
+            })
+        })
+
+        new Vue({
+            el: "#dcims",
+            data: {
+                localhost: "http://192.168.150.130:8089",
+                total: 0,
+                pagesize: 3,
+                currentPage: 1,
+                diagnosisTypeNo: 1,
+                diagnosis: [],
+                reportCards: [],
+                dialogFormVisible: false,
+                warndialogFormVisible: false,
+                formLabelWidth: "120px",
+                reportCardOne1: '',
+                pickerOptions: {
+                    shortcuts: [{
+                        text: '最近一周',
+                        onClick(picker) {
+                            const end = new Date();
+                            const start = new Date();
+                            start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+                            picker.$emit('pick', [start, end]);
+                        }
+                    }, {
+                        text: '最近一个月',
+                        onClick(picker) {
+                            const end = new Date();
+                            const start = new Date();
+                            start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+                            picker.$emit('pick', [start, end]);
+                        }
+                    }, {
+                        text: '最近三个月',
+                        onClick(picker) {
+                            const end = new Date();
+                            const start = new Date();
+                            start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+                            picker.$emit('pick', [start, end]);
+                        }
+                    }],
+                },
+                elimiData: {
+                    cause: "",
+                    content: ""
+                },
+                warnInfo: {
+                    patientId: 0,
+                    conditionNo: "",
+                    warnTypeNo: "",
+                    warnContent: "",
+                    reportCardId: 0,
+                    status: 0,
+                    departmentNo: 0
+                },
+                warnTypes: [],
+                warnconditions: [],
+                handleAction: -1,
+                status1: 1,
+                upTime: "",
+                startDate: "",
+                endDate: "",
+                user: {},
+                nowDate: "",
+                isLoading: true
+            },
+            methods: {
+                getInfo: function () {
+                    this.currentPage = 1;
+                    var that = this;
+                    console.log(this.upTime)
+                    if (this.upTime.length == 2) {
+                        this.startDate = this.upTime[0].format("yyyy-MM-dd");
+                        this.endDate = this.upTime[1].format("yyyy-MM-dd");
+                    }
+                    $.ajax({
+                        url: this.localhost + "/user/collectReportCard",
+                        type: "post",
+                        data: {
+                            diagnosisTypeNo: this.diagnosisTypeNo,
+                            handleAction: this.handleAction,
+                            status: this.status1,
+                            startDate: this.startDate,
+                            endDate: this.endDate
+                        },
+                        success: function (res) {
+                            that.user = res.user
+                            $(".username-show").text(that.user.name)
+                            that.diagnosis = res.diagnosisTypes;
+                            that.reportCards = res.reportCards
+                            that.total = that.reportCards.length
+                            that.isLoading = false
+                        }
+                    })
+                },
+                current_change: function (currentPage) {
+                    this.currentPage = currentPage;
+                },
+                logout: function () {
+                    $.ajax({
+                        type: "post",
+                        url: this.localhost + "/logout",
+                        dataType: "json",
+                        data: {},
+                        success: function (res) {
+                            if (res.code == 200) {
+                                window.location.href = "http://192.168.150.130:8089/pages/login.html";
+                            } else {
+                                alert("退出失败")
+                            }
+                        }
+                    })
+                },
+                suspected: function (reportCardOne) {
+                    var that = this;
+                    $.ajax({
+                        url: this.localhost + "/user/susReportCard",
+                        type: "post",
+                        data: {
+                            id: reportCardOne.id
+                        },
+                        success: function (res) {
+                            console.log(res)
+                            if (res) {
+                                that.getInfo()
+                            }
+                        }
+                    })
+                },
+                handle: function (reportCardOne) {
+                    this.warnInfo = {
+                        patientId: 0,
+                        conditionNo: "",
+                        warnTypeNo: "",
+                        warnContent: "",
+                        reportCardId: 0,
+                        status: 0,
+                        departmentNo: 0
+                    }
+                    this.warnInfo.patientId = reportCardOne.patientId
+                    this.warnInfo.reportCardId = reportCardOne.id
+                    this.warnInfo.departmentNo = reportCardOne.departmentNo
+                    var that = this;
+                    $.ajax({
+                        url: this.localhost + "/user/findAllWarnTypesAndConditions",
+                        type: "post",
+                        data: {},
+                        success: function (res) {
+                            that.warnTypes = res.warnTypes
+                            that.warnconditions = res.warnconditions
+                        }
+                    })
+                    this.warndialogFormVisible = true
+                },
+                warn: function () {
+                    var that = this;
+                    $.ajax({
+                        url: this.localhost + "/user/warn",
+                        type: "post",
+                        data: this.warnInfo,
+                        success: function (res) {
+                            if (res.flag) {
+                                that.$message({
+                                    message: '提交成功',
+                                    type: 'success'
+                                });
+                                that.getInfo()
+                                that.warndialogFormVisible = false
+                            } else {
+                                that.$message.error("提交失败，请稍后再试")
+                            }
+                        },
+                        error: function (res) {
+                            that.$message.error("提交失败，请稍后再试")
+                        }
+                    })
+
+                },
+                elimi1: function (reportCardOne) {
+                    this.reportCardOne1 = reportCardOne
+                    this.dialogFormVisible = true;
+                },
+                elimi: function () {
+                    this.dialogFormVisible = false;
+                    var that = this;
+                    $.ajax({
+                        url: this.localhost + "/user/eliminateWarn",
+                        type: "post",
+                        data: {
+                            patientId: this.reportCardOne1.patientId,
+                            content: this.elimiData.content,
+                            cause: this.elimiData.cause,
+                            reportCardId: this.reportCardOne1.id,
+                            doctorNo: this.reportCardOne1.mainDoctor.doctorNo,
+                            userId: this.user.id
+                        },
+                        success: function (res) {
+                            console.log(res)
+                            if (res) {
+                                that.$message({
+                                    message: '提交成功',
+                                    type: 'success'
+                                });
+                                that.getInfo()
+                            }
+                        }
+                    })
+                }
+
+            },
+            created: function () {
+                Date.prototype.format = function (format) {
+                    var o = {
+                        "M+": this.getMonth() + 1, //month
+                        "d+": this.getDate(), //day
+                        "h+": this.getHours(), //hour
+                        "m+": this.getMinutes(), //minute
+                        "s+": this.getSeconds(), //second
+                        "q+": Math.floor((this.getMonth() + 3) / 3), //quarter
+                        "S": this.getMilliseconds() //millisecond
+                    }
+                    if (/(y+)/.test(format)) {
+                        format = format.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+                    }
+                    for (var k in o) {
+                        if (new RegExp("(" + k + ")").test(format)) {
+                            format = format.replace(RegExp.$1, RegExp.$1.length == 1 ? o[k] : ("00" + o[k]).substr(("" + o[k]).length));
+                        }
+                    }
+                    return format;
+                }
+                this.nowDate = new Date().format("yyyy年MM月dd日 hh:mm:ss")
+                // this.upTime = new Date().format("yyyy-MM-dd")
+                this.getInfo()
+            },
+
+        })
+    })
+
+</script>
+</body>
+</html>

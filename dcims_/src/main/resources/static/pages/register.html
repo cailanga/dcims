@@ -1,0 +1,158 @@
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title></title>
+		<link rel="stylesheet" type="text/css" href="/bower_components/bootstrap/dist/css/bootstrap.min.css" />
+		<link rel="stylesheet" type="text/css" href="/css/register.css" />
+		<script src="/js/jquery-3.3.1.min.js"></script>
+		<script src="/js/vue.min.js"></script>
+	</head>
+	<body>
+		<div class="container" id="dcims">
+			<div class="row">
+				<div class="col-md-offset-3 col-md-6">
+					<form action="/user/register" method="post" class="form-horizontal">
+						<div class="heading-div">
+							<div>
+								<span class="heading">
+									注册
+								</span>
+							</div>
+							<div class="heading"><a href="/pages/login.html">已有账号？去登陆</a></div>
+						</div>
+						<div class="form-group">
+							<h5><span  class="r_error fa fa-user" style="height:5px;color: red;"></span></h5>
+						</div>
+						<div class="form-group">
+							<input type="email" class="form-control" name="username" id="inputEmail3" placeholder="用户名或电子邮件">
+							<i class="fa fa-user"></i>
+						</div>
+						<div class="form-group">
+							<input type="text" class="form-control" name="name" id="inputEmail4" placeholder="姓名">
+							<i class="fa fa-user"></i>
+						</div>
+						<div class="form-group help">
+							<input type="password" class="form-control" name="password" id="inputPassword3" placeholder="密　码">
+							<i class="fa fa-lock"></i>
+							<a href="#" class="fa fa-question-circle"></a>
+						</div>
+						<div class="form-group help">
+							<input type="password" class="form-control" name="rePassword" id="inputPassword4" placeholder="确  认  密　码">
+							<i class="fa fa-lock"></i>
+							<a href="#" class="fa fa-question-circle"></a>
+						</div>
+						<div class="form-group help">
+							<input type="text" class="form-control code inputcode" name="checkCode" id="inputPassword5" placeholder="验  证  码">
+							<i class="fa fa-lock"></i>
+							<a href="#" class="fa fa-question-circle"></a>
+						</div>
+						<div class="form-group help validcode">
+							<a class="vcimg"><img alt="这是一张图片" src="#">&nbsp;&nbsp;<span  class="nextCode">换一张</span></a>
+						</div>
+						<div class="form-group help" >
+							<span  class="error fa fa-user" style="color: red;display: none"></span>
+						</div>
+						<div class="form-group">
+							<button type="submit" class="btn btn-default">注册</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</body>
+	<script src="/js/jquery-3.3.1.min.js"></script>
+<script>
+	function initcode(){
+		var xhr = new XMLHttpRequest();
+		xhr.open("get", "http://192.168.150.130:8089/user/vc", true);
+		xhr.responseType = "blob";
+		xhr.onload = function() {
+			if (this.status == 200) {
+				var blob = this.response;
+				$(".vcimg>img").attr("src",window.URL.createObjectURL(blob));
+			}
+		}
+		xhr.send();
+	}
+	$(function () {
+		var codeStatus="";
+		initcode();
+		$(".vcimg").click(function () {
+			initcode();
+			$(".error").html("");
+			$(".error").css("display","none");
+		})
+		$(".inputcode").blur(function () {
+			$.post("http://192.168.150.130:8089/user/loginCheckCode",{"checkCode":$(".inputcode").val()},function (data) {
+				console.log("data:"+data)
+				codeStatus=data;
+				if(data=="success"){
+					$(".error").html("");
+					$(".error").css("display","none");
+				}else if(data=="null"){
+
+					$(".error").html("验证码不能为空");
+					$(".error").css("display","block");
+				}else if(data=="error"){
+
+					$(".error").html("验证码错误");
+					$(".error").css("display","block");
+				}
+			})
+		})
+		$("form").submit(function () {
+			if($("#inputEmail3").val()==""||
+				$("#inputEmail4").val()==""||
+			$("#inputPassword3").val()==""||
+			$("#inputPassword5").val()==""||
+			$("#inputPassword4").val()==""){
+				alert("请输入完整信息再登录")
+				return false
+			}
+			if(codeStatus=="success"){
+                $(".error").html("");
+                $(".error").css("display","none");
+				$.ajax({
+					url:"http://192.168.150.130:8089/user/register",
+					type:"post",
+					data:{
+						username:$("#inputEmail3").val(),
+						name:$("#inputEmail4").val(),
+						password:$("#inputPassword3").val(),
+                        checkCode:$("#inputPassword5").val(),
+                        rePassword:$("#inputPassword4").val()
+					},
+					success:function (data) {
+						console.log(data+"(msg):")
+						if(data=="success"){
+							window.location.href = "http://192.168.150.130:8089/pages/login.html";
+						}else if(data=="code_error"){
+							$(".r_error").text("验证码错误")
+						}else if(data=="notSame"){
+							$(".r_error").text("两次密码不一致")
+						}else{
+							$(".r_error").text("验证码为空")
+						}
+					},
+					error:function () {
+						// window.location.href ="http://192.168.150.130:8089/pages/failer.html"
+						alert("注册失败，请再次尝试")
+						codeStatus=""
+						return
+					}
+				})
+
+			}
+			if(codeStatus=="error"){
+				$(".error").css("display","block");
+				$(".error").html("验证码错误");
+			}else{
+				$(".error").css("display","block");
+				$(".error").html("请将信息填写完整");
+			}
+			return false;
+		})
+	})
+
+</script>
+</html>

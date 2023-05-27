@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>医院感染信息监测系统</title>
+  <!-- Tell the browser to be responsive to screen width -->
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+  <!-- Bootstrap 3.3.7 -->
+  <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.min.css">
+  <!-- Ionicons -->
+  <link rel="stylesheet" href="bower_components/Ionicons/css/ionicons.min.css">
+  <!-- Theme style -->
+  <link rel="stylesheet" href="dist/css/AdminLTE.min.css">
+  <!-- AdminLTE Skins. Choose a skin from the css/skins
+       folder instead of downloading all of them to reduce the load. -->
+  <link rel="stylesheet" href="dist/css/skins/_all-skins.min.css">
+
+  <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+  <!--[if lt IE 9]>
+  <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+  <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+  <![endif]-->
+</head>
+<!-- ADD THE CLASS layout-top-nav TO REMOVE THE SIDEBAR. -->
+<body class="hold-transition skin-blue layout-top-nav">
+<div class="wrapper">
+
+  <header class="main-header">
+	  
+    <nav class="navbar navbar-static-top">
+      <div class="container">
+        <div class="navbar-header">
+          <a href="#" class="navbar-brand">疾控信息管理系统</a>
+        </div>
+        <!-- Navbar Right Menu -->
+        <div class="navbar-custom-menu">
+        	<ul class="nav navbar-nav">
+        		<!-- Messages: style can be found in dropdown.less-->
+        		<li class="dropdown messages-menu active">
+        			<a href="疾控信息管理系统-首页.html">首页</a>
+        		</li>
+        		<li class="dropdown messages-menu">
+        			<a href="疾控信息管理系统-收集报卡.html">收集报卡</a>
+        		</li>
+        		<li class="dropdown messages-menu">
+        			<a href="疾控信息管理系统-病区概况.html">病区概况</a>
+        		</li>
+        		<li class="dropdown messages-menu">
+        			<a href="疾控信息管理系统-智能筛查.html">智能筛查</a>
+        		</li>
+        		<li class="dropdown messages-menu">
+        			<a href="疾控信息管理系统-数据审核.html">数据审核</a>
+        		</li>
+        		<li class="dropdown messages-menu">
+        			<a href="疾控信息管理系统-数据查询.html">数据查询</a>
+        		</li>
+        		<li class="dropdown messages-menu">
+        			<a href="疾控信息管理系统-系统设置.html">统计分析</a>
+        		</li>
+        		<li class="dropdown messages-menu">
+        			<a href="疾控信息管理系统-系统设置.html">系统设置</a>
+        		</li>
+        		<li class="dropdown messages-menu">
+        			<a href="#" class="dropdown-toggle" data-toggle="dropdown">修改密码</a>
+        		</li>
+        		<li class="dropdown user user-menu">
+        			<a href="#">
+        				<img src="dist/img/avatar5.png" class="user-image" alt="User Image">
+        				<span class="hidden-xs">健康达人</span>
+        			</a>
+        		</li>
+        	</ul>
+        </div>
+        <!-- /.navbar-custom-menu -->
+      </div>
+      <!-- /.container-fluid -->
+    </nav>
+  </header>
+  <!-- Full Width Column -->
+  <div class="content-wrapper">
+    <div class="container">
+      <!-- Content Header (Page header) -->
+      <section class="content-header">
+		 <div class="col-lg-3 col-xs-6">
+		  	<div class="small-box bg-red">
+		  	  <div class="inner">
+		  				  <p>HOSTPITAL CARD</p>
+		  				  <h4>院感报卡</h4>
+		  	  </div>
+		  	  <div class="icon">
+		  	    <i class="fa fa-list"></i>
+		  	  </div>
+		  	  <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+		  	</div>
+		  </div>
+		<!-- ./col -->
+		<div class="col-lg-3 col-xs-6">
+		  <!-- small box -->
+		  <div class="small-box bg-orange">
+		    <div class="inner">
+			  <p>MANUAL SCREENING</p>
+			  <h4>手动筛选</h4>
+		    </div>
+		    <div class="icon">
+		      <i class="fa fa-hand-stop-o"></i>
+		    </div>
+		    <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+		  </div>
+		  
+		</div>
+
+		<div class="col-lg-3 col-xs-6">
+			<div class="small-box bg-aqua">
+			  <div class="inner">
+						  <p>PROBABYUTY</p>
+						  <h4>漏报筛查</h4>
+			  </div>
+			  <div class="icon">
+			    <i class="fa fa-filter"></i>
+			  </div>
+			  <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+			</div>
+		</div>
+		<div class="col-lg-3 col-xs-6">
+			<div class="small-box bg-red">
+			  <div class="inner">
+						  <p>HOSTPITAL CARD</p>
+						  <h4>系统提示</h4>
+			  </div>
+			  <div class="icon">
+			    <i class="glyphicon glyphicon-exclamation-sign"></i>
+			  </div>
+			  <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+			</div>
+		</div>
+      </section>
+	  <section class="content-header">
+	  		 <div class="col-lg-3 col-xs-6">
+	  		  	<div class="small-box bg-red">
+	  		  	  <div class="inner">
+	  		  				  <p>INTERVENE</p>
+	  		  				  <h4>干预</h4>
+	  		  	  </div>
+	  		  	  <div class="icon">
+	  		  	    <i class="fa fa-bullhorn"></i>
+	  		  	  </div>
+	  		  	  <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+	  		  	</div>
+	  		  </div>
+	  		<!-- ./col -->
+	  		<div class="col-lg-3 col-xs-6">
+	  		  <!-- small box -->
+	  		  <div class="small-box bg-aqua">
+	  		    <div class="inner">
+	  			  <p>INTELLIGENT</p>
+	  			  <h4>智能筛选</h4>
+	  		    </div>
+	  		    <div class="icon">
+	  		      <i class="fa fa-asterisk"></i>
+	  		    </div>
+	  		    <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+	  		  </div>
+	  		  
+	  		</div>
+	  
+	  		<!-- ./col -->
+	  		<div class="col-lg-3 col-xs-6">
+	  		  <!-- small box -->
+	  		  <div class="small-box bg-aqua">
+	  		    <div class="inner">
+	  			  <p>SUSPECTED OUTBREAK</p>
+	  			  <h4>疑似爆发</h4>
+	  		    </div>
+	  		    <div class="icon">
+	  		      <i class="fa fa-group"></i>
+	  		    </div>
+	  		    <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+	  		  </div>
+	  		  
+	  		</div>
+	  		<div class="col-lg-3 col-xs-6">
+	  			<div class="small-box bg-red">
+	  			  <div class="inner">
+	  						  <p>MULTIDRUG RESISTANCE</p>
+	  						  <h4>多重耐药</h4>
+	  			  </div>
+	  			  <div class="icon">
+	  			    <i class="fa fa-circle-o-notch"></i>
+	  			  </div>
+	  			  <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+	  			</div>
+	  		</div>
+	  </section>
+	  <section class="content">
+		 <div class="col-md-6">
+		   <div class="box box-default">
+		     <div class="box-header with-border bg-aqua">
+		       <h3 class="box-title">感染病例</h3>
+		     </div>
+		     <!-- /.box-header -->
+		     <div class="box-body">
+				<div class="col-md-5">
+				  <img class="img-responsive" src="images/1.jpg" alt="Photo">
+				</div>
+				<div class="col-md-7">
+					<h4 class="box-title"><i class="fa fa-area-chart"></i>&nbsp;&nbsp;按科室统计感染率</h4>
+					<h4 class="box-title"><i class="fa fa-bar-chart"></i>&nbsp;&nbsp;疾控病人详情</h4>
+					<h4 class="box-title"><i class="fa fa-pie-chart"></i>&nbsp;&nbsp;疾控部位构成比</h4>
+					<h4 class="box-title"><i class="fa fa-line-chart"></i>&nbsp;&nbsp;疾控易感因素统计</h4>
+				</div>
+		     </div>
+		     <!-- /.box-body -->
+		   </div>
+		   <!-- /.box -->
+		 </div>
+		 <!-- /.col -->
+		 <div class="col-md-6">
+		   <div class="box box-default">
+		     <div class="box-header with-border bg-aqua">
+		       <h3 class="box-title">手术</h3>
+		     </div>
+		     <!-- /.box-header -->
+		     <div class="box-body">
+		 				<div class="col-md-5">
+		 				  <img class="img-responsive" src="images/2.jpg" alt="Photo">
+		 				</div>
+		 				<div class="col-md-7">
+		 					<h4 class="box-title"><i class="fa fa-area-chart"></i>&nbsp;&nbsp;按科室统计</h4>
+		 					<h4 class="box-title"><i class="glyphicon glyphicon-list-alt"></i>&nbsp;&nbsp;按感染部位统计</h4>
+		 					<h4 class="box-title"><i class="fa fa-male"></i>&nbsp;&nbsp;不同危险指数等级的医师</h4>
+		 					<h4 class="box-title"><i class="glyphicon glyphicon-scissors"></i>&nbsp;&nbsp;手术切口类型统计</h4>
+		 				</div>
+		     </div>
+		     <!-- /.box-body -->
+		   </div>
+		   <!-- /.box -->
+		 </div>
+		 <!-- /.col -->
+		 <div class="col-md-6">
+		   <div class="box box-default">
+		     <div class="box-header with-border bg-aqua">
+		       <h3 class="box-title">数据查询</h3>
+		     </div>
+		     <!-- /.box-header -->
+		     <div class="box-body">
+		 				<div class="col-md-5">
+		 				  <img class="img-responsive" src="images/3.jpg" alt="Photo">
+		 				</div>
+		 				<div class="col-md-7">
+		 					<h4 class="box-title"><i class="fa fa-search"></i>&nbsp;&nbsp;疑似病例筛查</h4>
+		 					<h4 class="box-title"><i class="fa fa-list"></i>&nbsp;&nbsp;病人信息查询</h4>
+		 					<h4 class="box-title"><i class="fa fa-credit-card"></i>&nbsp;&nbsp;上报卡查询</h4>
+		 					<h4 class="box-title"><i class="fa fa-hospital-o"></i>&nbsp;&nbsp;细菌耐药搜索</h4>
+		 				</div>
+		     </div>
+		     <!-- /.box-body -->
+		   </div>
+		   <!-- /.box -->
+		 </div>
+		 <!-- /.col -->
+		 <div class="col-md-6">
+		   <div class="box box-default">
+		     <div class="box-header with-border bg-aqua">
+		       <h3 class="box-title">数据审核</h3>
+		     </div>
+		     <!-- /.box-header -->
+		     <div class="box-body">
+		 				<div class="col-md-5">
+		 				  <img class="img-responsive" src="images/4.jpg" alt="Photo">
+		 				</div>
+		 				<div class="col-md-7">
+		 					<h4 class="box-title"><i class="fa fa-group"></i>&nbsp;&nbsp;监测人数审核</h4>
+		 					<h4 class="box-title"><i class="fa fa-camera"></i>&nbsp;&nbsp;环境卫生学监测</h4>
+		 					<h4 class="box-title"><i class="fa fa-hand-paper-o"></i>&nbsp;&nbsp;手卫生审核</h4>
+		 					<h4 class="box-title"><i class="fa fa-bug"></i>&nbsp;&nbsp;ICU日志与病毒等级</h4>
+		 				</div>
+		     </div>
+		     <!-- /.box-body -->
+		   </div>
+		   <!-- /.box -->
+		 </div>
+		 <!-- /.col -->
+	  </section>
+      <!-- /.content -->
+    </div>
+    <!-- /.container -->
+  </div>
+  <!-- /.content-wrapper -->
+  <footer class="main-footer">
+	  <div class="pull-right hidden-xs">
+		  <b>医疗机构：</b>&nbsp;&nbsp;<b>当前操作员：</b>健康达人&nbsp;&nbsp; <b>上次预警刷新时间：</b>2020-09-19 15:09:35 
+	  </div>
+	  <strong></strong>
+  </footer>
+</div>
+<!-- ./wrapper -->
+
+<!-- jQuery 3 -->
+<script src="bower_components/jquery/dist/jquery.min.js"></script>
+<!-- Bootstrap 3.3.7 -->
+<script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+<!-- SlimScroll -->
+<script src="bower_components/jquery-slimscroll/jquery.slimscroll.min.js"></script>
+<!-- FastClick -->
+<script src="bower_components/fastclick/lib/fastclick.js"></script>
+<!-- AdminLTE App -->
+<script src="dist/js/adminlte.min.js"></script>
+<!-- AdminLTE for demo purposes -->
+<script src="dist/js/demo.js"></script>
+</body>
+</html>

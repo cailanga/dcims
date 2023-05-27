@@ -1,0 +1,2071 @@
+<!doctype html>
+<html class="no-js" lang="zxx">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>医院感染信息监测系统 </title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Place favicon.ico in the root Internist, General Practitonery -->
+
+    <!-- CSS here -->
+    <link rel="stylesheet" href="../../css/bootstrap.min.css">
+    <link rel="stylesheet" href="../../css/animate.min.css">
+    <link rel="stylesheet" href="../../css/magnific-popup.css">
+    <link rel="stylesheet" href="../../fontawesome/css/all.min.css">
+    <link rel="stylesheet" href="../../css/dripicons.css">
+    <link rel="stylesheet" href="../../css/slick.css">
+    <link rel="stylesheet" href="../../css/default.css">
+    <link rel="stylesheet" href="../../css/meanmenu.css">
+    <link rel="stylesheet" href="../../css/style.css">
+
+
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <script src="/js/jquery-3.3.1.min.js"></script>
+    <script src="/js/vue.min.js"></script>
+    <script src="/js/axios.js"></script>
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <script type="text/javascript" charset="utf-8" src="/pages/ueditor/ueditor.config.js"></script>
+    <script type="text/javascript" charset="utf-8" src="/pages/ueditor/ueditor.all.js"> </script>
+    <script type="text/javascript" charset="utf-8" src="/pages/ueditor/lang/zh-cn/zh-cn.js"></script>
+
+    <link rel="stylesheet" href="../../css/responsive.css">
+    <style type="text/css">
+        .user {
+            display: inline;
+        }
+
+        .patient {
+            width: 350px;
+            /* height: 400px; */
+            background-color: #D9E6F5;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /*动画加载*/
+        .loading {
+            position: fixed;
+            left: 0;
+            top: 0;
+            /*background: url('/img/three-dots.svg') center center no-repeat #fff;*/
+            background-color: white;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1000;
+            /*opacity: 0.8;*/
+        }
+
+        .main {
+            height: 100px;
+            width: 100px;
+            margin: 200px auto
+        }
+
+        .main div {
+            color: #799761;
+            margin: 50px auto;
+        }
+
+        svg {
+            fill: none
+        }
+
+        .load {
+            stroke-width: 15px;
+            stroke-dasharray: 252;
+            stroke-dashoffset: 0;
+            animation: load 1.5s ease-in-out infinite;
+            transform-origin: center center
+
+        }
+
+        .one {
+            stroke: #b8d8d7;
+        }
+
+        .two {
+            stroke: #73c0b0;
+            animation-delay: 0.1s;
+        }
+
+        .three {
+            stroke: #4d8f8e;
+            animation-delay: 0.2s
+        }
+
+        @keyframes load {
+            0%, 100% {
+                stroke-dashoffset: 252
+            }
+            50% {
+                stroke-dashoffset: 230
+            }
+            100% {
+                transform: rotate(360deg)
+            }
+        }
+
+        .jump {
+            animation: jump 0.5s ease-in-out infinite
+        }
+
+        .first {
+            fill: #b8d8d7;
+        }
+
+        .second {
+            fill: #73c0b0;
+            animation-delay: 0.1s;
+        }
+
+        .third {
+            fill: #4d8f8e;
+            animation-delay: 0.2s;
+        }
+
+        @keyframes jump {
+            0%, 100% {
+                transform: translateY(0)
+            }
+            50% {
+                transform: translateY(-10px)
+            }
+        }
+
+        .el-dialog {
+            width: 30%;
+        }
+
+        .el-dialog__header {
+            text-align: center;
+        }
+
+        .dialog-footer {
+            text-align: center;
+        }
+
+        .pt-120 {
+            padding-top: 50px;
+        }
+
+        .second-menu .main-menu ul li:nth-child(3) {
+            border-bottom: #0b3e6f 3px solid;
+        }
+        .toolbar {
+            border: 1px solid #ccc;
+        }
+        .text {
+            border: 1px solid #ccc;
+            min-height: 300px;
+        }
+    </style>
+
+</head>
+<body>
+<!-- header -->
+<div class="headerpage_m"></div>
+<!-- header-end -->
+<!-- main-area -->
+<main id="dcims">
+    <!-- breadcrumb-area -->
+    <section class="breadcrumb-area d-flex align-items-center" style="background-color: #82A2C2;min-height: 100px">
+        <div class="container">
+            <div class="row">
+                <div class="col-xl-6 offset-xl-3 col-lg-8 offset-lg-2">
+                    <div class="breadcrumb-wrap text-center">
+                        <div class="breadcrumb-title mb-30">
+                            <h2>数据管理</h2>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <div v-if="isLoading" class="loading">
+        <div class="main">
+            <svg viewBox="0 0 120 120">
+                <circle class="load one" cx="60" cy="60" r="40"></circle>
+                <circle class="load two" cx="60" cy="60" r="40"></circle>
+                <circle class="load three" cx="60" cy="60" r="40"></circle>
+                <circle class="jump first" cx="45" cy="60" r="5"></circle>
+                <circle class="jump second" cx="60" cy="60" r="5"></circle>
+                <circle class="jump third" cx="75" cy="60" r="5"></circle>
+            </svg>
+        </div>
+    </div>
+    <section class="shop-area pt-120 pb-120 p-relative wow fadeInUp animated" data-animation="fadeInUp animated"
+             data-delay=".2s">
+        <div class="container">
+
+            <el-tabs type="border-card" @tab-click="test">
+
+                <el-tab-pane label="手术信息">
+                    <div style="margin: 5px">
+                        <button @click="addOperation">添加手术信息</button>
+                    </div>
+                    <el-table
+                            border
+                            :data="operations.slice((currentPage-1)*pagesize,currentPage*pagesize)"
+                            stripe
+                            style="width: 100%">
+                        <el-table-column
+                                show-overflow-tooltip
+                                prop="patientId"
+                                label="病人编号"
+                        >
+                        </el-table-column>
+                        <el-table-column
+                                prop="operationName"
+                                label="手术名称"
+                        >
+                        </el-table-column>
+                        <el-table-column
+                                prop="operationTimeStr"
+                                label="手术时间"
+                        >
+                        </el-table-column>
+                        <el-table-column
+                                show-overflow-tooltip
+                                prop="doctor.doctorName"
+                                label="手术医生"
+                        >
+                        </el-table-column>
+                        <el-table-column
+                                show-overflow-tooltip
+                                prop="grade"
+                                label="切口等级"
+                        >
+                        </el-table-column>
+                        <el-table-column label="操作">
+                            <template slot-scope="scope">
+                                <el-button
+                                        size="medium "
+                                        type="primary"
+                                        @click="addOperationFollow(scope.row)">设置手术回访
+                                </el-button>
+                                </el-button>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                </el-tab-pane>
+                <el-tab-pane label="检验检查信息">
+                    <div style="margin: 5px;display: inline-block;">
+                        <button @click="addCheckList">添加检验检查信息</button>
+                    </div>
+                    <div style="margin: 5px;margin-left: 10px;display: inline-block;">
+                        <div style="display: inline-block;"><el-input v-model="patientId" placeholder="请输入病人编号查询" type="number"></el-input></div>
+                        <div style="margin-left: 5px;display: inline-block;">
+                            <el-button type="primary" @click="getCheckLists">查询</el-button>
+                        </div>
+                    </div>
+                    <el-table
+                            border
+                            :data="checkLists.slice((currentPage-1)*pagesize,currentPage*pagesize)"
+                            stripe
+                            style="width: 100%">
+                        <el-table-column
+                                show-overflow-tooltip
+                                prop="patientId"
+                                label="病人编号"
+                        >
+                        </el-table-column>
+                        <el-table-column
+                                prop="checkNo"
+                                label="检验单号"
+                        >
+                        </el-table-column>
+                        <el-table-column
+                                prop="checkTimeStr"
+                                label="送检日期"
+                        >
+                        </el-table-column>
+                        <el-table-column
+                                show-overflow-tooltip
+                                label="标本"
+                        >
+                            <template slot-scope="scope">
+                                <span v-for="(item,index) in scope.row.checkTypes"><span v-if="index==0">{{item.checkTypeName}}</span><span
+                                        v-else>,{{item.checkTypeName}}</span></span>
+                            </template>
+                        </el-table-column>
+                        <el-table-column
+                                prop="doctor.doctorName"
+                                label="备注"
+                                width="100px"
+                        >
+                        </el-table-column>
+
+                        <el-table-column label="操作">
+                            <template slot-scope="scope">
+                                <div style="text-align: center">
+                                    <div style="text-align: center">
+                                        <el-button
+                                                size="small "
+                                                type="primary"
+                                                @click="addCheckResultList(scope.row)">添加检查结果
+                                        </el-button>
+                                    </div>
+                                    <div style="text-align: center;margin-top: 5px">
+                                        <el-button
+                                                size="small "
+                                                type="primary"
+                                                @click="lookCheckResultList(scope.row)">查看检查结果
+                                        </el-button>
+                                    </div>
+                                </div>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                </el-tab-pane>
+                <el-tab-pane label="医嘱信息">
+                    <div style="margin: 5px;display: inline-block;">
+                        <button @click="addMedicalAdvice">添加医嘱信息</button>
+                    </div>
+                    <div style="margin: 5px;margin-left: 10px;display: inline-block;">
+                        <div style="display: inline-block;"><el-input v-model="Y_patientId" placeholder="请输入病人编号查询" type="number"></el-input></div>
+                        <div style="margin-left: 5px;display: inline-block;">
+                            <el-button type="primary" @click="getMedicalAdvices">查询</el-button>
+                        </div>
+                    </div>
+                    <el-table
+                            border
+                            :data="medicalAdvices.slice((currentPage-1)*pagesize,currentPage*pagesize)"
+                            stripe
+                            style="width: 100%">
+                        <el-table-column
+                                show-overflow-tooltip
+                                prop="patientId"
+                                label="病人编号"
+                        >
+                        </el-table-column>
+                        <el-table-column
+                                prop="medicalAdviceType.medicalAdviceName"
+                                label="医嘱类型"
+                        >
+                        </el-table-column>
+                        <el-table-column
+                                show-overflow-tooltip
+                                prop="startTimeStr"
+                                label="开嘱时间"
+                        >
+                        </el-table-column>
+                        <el-table-column
+                                show-overflow-tooltip
+                                prop="endTimeStr"
+                                label="停嘱时间"
+                        >
+                        </el-table-column>
+                        <el-table-column
+                                show-overflow-tooltip
+                                prop="endExcuteTimeStr"
+                                label="最后执行时间"
+                        >
+                        </el-table-column>
+                        <el-table-column
+                                show-overflow-tooltip
+                                prop="medicalAdviceName"
+                                label="医嘱名称"
+                        >
+                        </el-table-column>
+                        <el-table-column
+                                show-overflow-tooltip
+                                prop="cause"
+                                label="用药原因"
+                        >
+                        </el-table-column>
+                        <el-table-column
+                                show-overflow-tooltip
+                                prop="goal"
+                                label="用药目的"
+                        >
+                        </el-table-column>
+                        <el-table-column
+                                show-overflow-tooltip
+                                prop="signall"
+                                label="单次剂量"
+                        >
+                        </el-table-column>
+                        <el-table-column
+                                show-overflow-tooltip
+                                prop="unit"
+                                label="计量单位"
+                        >
+                        </el-table-column>
+                        <el-table-column
+                                show-overflow-tooltip
+                                prop="frequency"
+                                label="使用频次"
+                        >
+                        </el-table-column>
+                        <el-table-column
+                                show-overflow-tooltip
+                                prop="route"
+                                label="用药途径"
+                        >
+                        </el-table-column>
+                        <el-table-column
+                                show-overflow-tooltip
+                                prop="doctor.doctorName"
+                                label="开嘱医生"
+                        >
+                        </el-table-column>
+                        <el-table-column
+                                show-overflow-tooltip
+                                prop="antibiotic"
+                                label="是否是抗生素"
+                        >
+                        </el-table-column>
+                        <el-table-column
+                                show-overflow-tooltip
+                                prop="instruction"
+                                label="医嘱说明"
+                        >
+                        </el-table-column>
+                        <el-table-column
+                                show-overflow-tooltip
+                                prop="remark"
+                                label="备注"
+                        >
+                        </el-table-column>
+                        <el-table-column
+                                show-overflow-tooltip
+                                prop="update_dateStr"
+                                label="更新时间"
+                        >
+                        </el-table-column>
+
+                        <el-table-column label="操作">
+                            <template slot-scope="scope">
+                                <el-button
+                                        type="primary"
+                                        @click="updMedicalAdvice(scope.row)">修改
+                                </el-button>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                </el-tab-pane>
+                <el-tab-pane label="病历信息">
+                    <div style="margin: 5px;display: inline-block">
+                        <button @click="addCaseList">添加病例信息</button>
+                    </div>
+                    <div style="margin: 5px;margin-left: 10px;display: inline-block;">
+                        <div style="display: inline-block;"><el-input v-model="C_patientId" placeholder="请输入病人编号查询" type="number"></el-input></div>
+                        <div style="margin-left: 5px;display: inline-block;">
+                            <el-button type="primary" @click="getCaseLists">查询</el-button>
+                        </div>
+                    </div>
+                    <el-table
+                            border
+                            :data="caseLists.slice((currentPage-1)*pagesize,currentPage*pagesize)"
+                            stripe
+                            style="width: 100%">
+                        <el-table-column
+                                show-overflow-tooltip
+                                prop="patientId"
+                                label="病人编号"
+                        >
+                        </el-table-column>
+                        <el-table-column
+                                show-overflow-tooltip
+                                prop="patientinfo.name"
+                                label="姓名"
+                        >
+                        </el-table-column>
+                        <el-table-column
+                                prop="recordTimeStr"
+                                label="记录时间"
+                        >
+                        </el-table-column>
+                        <el-table-column
+                                prop="caseName"
+                                label="病程名称"
+                        >
+                        </el-table-column>
+                        <el-table-column
+                                label="病例内容"
+                                width="500px"
+                        >
+                            <template slot-scope="scope">
+
+                                <span v-html="scope.row.content"></span>
+
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                </el-tab-pane>
+            </el-tabs>
+
+            <!-- 分页信息 -->
+            <div class="pagination-wrap mt-50 text-center">
+                <div style="text-align: center;margin-top: 30px;">
+                    <el-pagination
+                            :page-size="pagesize"
+                            background
+                            layout="prev, pager, next"
+                            :total="total"
+                            @current-change="current_change">
+                    </el-pagination>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    </section>-->
+    <el-dialog title="添加手术信息" :show-close="false" :visible.sync="operationAddDialogFormVisible">
+        <el-form :model="operation">
+            <el-form-item label="病人编号" :label-width="formLabelWidth">
+                <el-input placeholder="请输入病人编号" v-model="operation.patientId" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="手术名称" :label-width="formLabelWidth">
+                <el-input placeholder="请输入手术名称" v-model="operation.operationName" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="手术时间" :label-width="formLabelWidth">
+                <el-date-picker
+                        v-model="operation.operateTime"
+                        type="datetime"
+                        placeholder="选择日期时间"
+                        align="right"
+                        :picker-options="pickerOptions">
+                </el-date-picker>
+            </el-form-item>
+            <el-form-item label="切口等级" :label-width="formLabelWidth">
+                <el-input placeholder="请输入切口等级" type="number" v-model="operation.grade" auto-complete="off"></el-input>
+            </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="operationAddCancel">取 消</el-button>
+            <el-button type="primary" @click="operationAddOk">确 定</el-button>
+        </div>
+    </el-dialog>
+    <el-dialog title="手术回访信息" :show-close="false" :visible.sync="operationFollowAddDialogFormVisible">
+        <el-form :model="operation">
+            <el-form-item label="手术回访时间" :label-width="formLabelWidth">
+                <el-date-picker
+                        v-model="operation.nextDate"
+                        type="datetime"
+                        placeholder="选择日期时间"
+                        align="right"
+                        :picker-options="pickerOptions">
+                </el-date-picker>
+            </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="operationFollowAddCancel">取 消</el-button>
+            <el-button type="primary" @click="operationFollowAddOk">确 定</el-button>
+        </div>
+    </el-dialog>
+
+    <el-dialog title="添加检验单信息" :show-close="false" :visible.sync="checkListAddDialogFormVisible">
+        <el-form :model="checkList">
+            <el-form-item label="病人编号" :label-width="formLabelWidth">
+                <el-input placeholder="请输入病人编号" v-model="checkList.patientId" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="送检日期" :label-width="formLabelWidth">
+                <el-date-picker
+                        v-model="checkList.checkTime"
+                        type="datetime"
+                        placeholder="选择日期时间"
+                        align="right"
+                        :picker-options="pickerOptions">
+                </el-date-picker>
+            </el-form-item>
+            <el-form-item label="备注" :label-width="formLabelWidth">
+                <el-input placeholder="请输入备注信息" v-model="checkList.remark" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="送检标本" :label-width="formLabelWidth">
+                <el-select multiple placeholder="请选择" class="form-horizontal" v-model="checkList.specimenName">
+                    <el-option :label="item.checkTypeName" :value="item.checkTypeNo" v-for="item in checkTypes"></el-option>
+                </el-select>
+            </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="checkListAddCancel">取 消</el-button>
+            <el-button type="primary" @click="checkListAddOk">确 定</el-button>
+        </div>
+    </el-dialog>
+    <el-dialog title="添加检验结果信息" :show-close="false" :visible.sync="checkResultListAddDialogFormVisible">
+        <el-form :model="checkResultList">
+            <el-form-item label="检验单号" :label-width="formLabelWidth">
+                <el-input :disabled="true" v-model="checkResultList.checkNo" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="检查结果时间" :label-width="formLabelWidth">
+
+                <el-date-picker
+                        v-model="checkResultList.resultTime"
+                        type="datetime"
+                        placeholder="选择日期时间"
+                        align="right"
+                        :picker-options="pickerOptions">
+                </el-date-picker>
+            </el-form-item>
+            <el-form-item label="检查项目名称" :label-width="formLabelWidth">
+                <el-input placeholder="请输入检验项目名称" v-model="checkResultList.checkName" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="检查结果" :label-width="formLabelWidth">
+                <el-input placeholder="请输入检查结果" v-model="checkResultList.checkResult" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="单位" :label-width="formLabelWidth">
+                <el-input placeholder="请输入单位" v-model="checkResultList.unit" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="范围" :label-width="formLabelWidth">
+                <el-input placeholder="请输入范围" v-model="checkResultList.range" auto-complete="off"></el-input>
+            </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="checkResultListAddCancel">取 消</el-button>
+            <el-button type="primary" @click="checkResultListAddOk">确 定</el-button>
+        </div>
+    </el-dialog>
+    <el-dialog width="100%" title="查看检验结果信息" :show-close="false" :visible.sync="checkResultListLookDialogFormVisible">
+        <el-table
+                border
+                :data="checkResultLists.slice((AcurrentPage-1)*Apagesize,AcurrentPage*Apagesize)"
+                stripe
+                style="width: 100%">
+            <el-table-column
+                    show-overflow-tooltip
+                    prop="checkNo"
+                    label="送检单编号"
+            >
+            </el-table-column>
+            <el-table-column
+                    prop="resultTimeStr"
+                    label="结果日期"
+            >
+            </el-table-column>
+            <el-table-column
+                    prop="checkName"
+                    label="检验项目名称"
+            >
+            </el-table-column>
+            <el-table-column
+                    show-overflow-tooltip
+                    prop="checkResult"
+                    label="检查结果"
+            >
+            </el-table-column>
+            <el-table-column
+                    prop="unit"
+                    label="单位"
+                    width="100px"
+            >
+            </el-table-column>
+            <el-table-column
+                    prop="range"
+                    label="范围"
+                    width="100px"
+            >
+            </el-table-column>
+
+            <el-table-column label="操作">
+                <template slot-scope="scope">
+                    <el-button
+                            size="small "
+                            type="primary"
+                            @click="lookCheckPathogen(scope.row)">查看病原体
+                    </el-button>
+                    <el-button
+                            size="small "
+                            type="primary"
+                            @click="lookResultMedical(scope.row)">查看药检结果
+                    </el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+        <!-- 分页信息 -->
+        <div class="pagination-wrap mt-50 text-center">
+            <div style="text-align: center;margin-top: 30px;">
+                <el-pagination
+                        :page-size="Apagesize"
+                        background
+                        layout="prev, pager, next"
+                        :total="Atotal"
+                        @current-change="current_changeA">
+                </el-pagination>
+            </div>
+        </div>
+        <div slot="footer" class="dialog-footer">
+            <el-button type="primary" @click="checkResultListLookOk">确 定</el-button>
+        </div>
+    </el-dialog>
+    <el-dialog width="100%" title="查看病原体信息" :show-close="false" :visible.sync="checkPathogenLookDialogFormVisible">
+        <div style="margin: 5px;;">
+            <button @click="addCheckPathogen">添加病原体信息</button>
+        </div>
+        <el-table
+                border
+                :data="checkPathogens.slice((BcurrentPage-1)*Bpagesize,BcurrentPage*Bpagesize)"
+                stripe
+                style="width: 100%">
+            <el-table-column
+                    show-overflow-tooltip
+                    prop="pathogenNo"
+                    label="病原体编号"
+            >
+            </el-table-column>
+            <el-table-column
+                    prop="checkresultId"
+                    label="检查结果编号"
+            >
+            </el-table-column>
+            <el-table-column
+                    prop="date"
+                    label="检出日期"
+            >
+            </el-table-column>
+            <el-table-column
+                    show-overflow-tooltip
+                    prop="content"
+                    label="评语"
+            >
+            </el-table-column>
+        </el-table>
+        <!-- 分页信息 -->
+        <div class="pagination-wrap mt-50 text-center">
+            <div style="text-align: center;margin-top: 30px;">
+                <el-pagination
+                        :page-size="Bpagesize"
+                        background
+                        layout="prev, pager, next"
+                        :total="Btotal"
+                        @current-change="current_changeB">
+                </el-pagination>
+            </div>
+        </div>
+        <div slot="footer" class="dialog-footer">
+            <el-button type="primary" @click="checkPathogenLookOk">确 定</el-button>
+        </div>
+    </el-dialog>
+    <el-dialog width="100%" title="添加病原体信息" :show-close="false" :visible.sync="checkPathogenAddDialogFormVisible">
+        <el-form :model="checkPathogen">
+            <el-form-item label="检验结果单号" :label-width="formLabelWidth">
+                <el-input :disabled="true" v-model="checkPathogen.checkresultId" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="病原体" :label-width="formLabelWidth">
+                <el-select placeholder="请选择" class="form-horizontal" v-model="checkPathogen.pathogenNo">
+                    <el-option :label="item.pathogenName" :value="item.pathogenNo" v-for="item in pathogens"></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="检出日期" :label-width="formLabelWidth">
+                <el-date-picker
+                        v-model="checkPathogen.date"
+                        type="datetime"
+                        placeholder="选择日期时间"
+                        align="right"
+                        :picker-options="pickerOptions">
+                </el-date-picker>
+            </el-form-item>
+            <el-form-item label="评语" :label-width="formLabelWidth">
+                <el-input placeholder="请输入评语" v-model="checkPathogen.content" auto-complete="off"></el-input>
+            </el-form-item>
+
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="checkPathogenAddCancel">取消</el-button>
+            <el-button type="primary" @click="checkPathogenAddOk">确 定</el-button>
+        </div>
+    </el-dialog>
+    <el-dialog width="100%" title="查看药检结果信息" :show-close="false" :visible.sync="resultMedicalLookDialogFormVisible">
+        <div style="margin: 5px;;">
+            <button @click="addResultMedical">添加药检结果信息</button>
+        </div>
+        <el-table
+                border
+                :data="resultMedicals.slice((CcurrentPage-1)*Cpagesize,CcurrentPage*Cpagesize)"
+                stripe
+                style="width: 100%">
+            <el-table-column
+                    show-overflow-tooltip
+                    prop="checkresultId"
+                    label="检验结果编号"
+            >
+            </el-table-column>
+            <el-table-column
+                    prop="medicalName"
+                    label="药物名称"
+            >
+            </el-table-column>
+            <el-table-column
+                    prop="result"
+                    label="药敏结果"
+            >
+            </el-table-column>
+
+            </el-table-column>
+        </el-table>
+        <!-- 分页信息 -->
+        <div class="pagination-wrap mt-50 text-center">
+            <div style="text-align: center;margin-top: 30px;">
+                <el-pagination
+                        :page-size="Cpagesize"
+                        background
+                        layout="prev, pager, next"
+                        :total="Ctotal"
+                        @current-change="current_changeC">
+                </el-pagination>
+            </div>
+        </div>
+        <div slot="footer" class="dialog-footer">
+            <el-button type="primary" @click="ResultMedicalLookOk">确 定</el-button>
+        </div>
+    </el-dialog>
+    <el-dialog width="100%" title="添加药检结果信息" :show-close="false" :visible.sync="resultMedicalAddDialogFormVisible">
+        <el-form :model="resultMedical">
+            <el-form-item label="检验结果编号" :label-width="formLabelWidth">
+                <el-input :disabled="true" v-model="resultMedical.checkresultId" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="使用药物名称" :label-width="formLabelWidth">
+                <el-input placeholder="请输入药物名称" v-model="resultMedical.medicalName" auto-complete="off"></el-input>
+            </el-form-item>
+
+            <el-form-item label="药敏结果" :label-width="formLabelWidth">
+                <el-input placeholder="请输入药敏结果" v-model="resultMedical.result" auto-complete="off"></el-input>
+            </el-form-item>
+
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="ResultMedicalAddCancel">取消</el-button>
+            <el-button type="primary" @click="ResultMedicalAddOk">确 定</el-button>
+        </div>
+    </el-dialog>
+
+    <el-dialog title="添加医嘱" :show-close="false" :visible.sync="medicalAdviceAddDialogFormVisible">
+        <el-form :model="medicalAdvice">
+            <el-form-item label="病人编号" :label-width="formLabelWidth">
+                <el-input placeholder="请输入病人编号" v-model="medicalAdvice.patientId" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="医嘱名称" :label-width="formLabelWidth">
+                <el-input placeholder="请输入医嘱名称" v-model="medicalAdvice.medicalAdviceName" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="医嘱类型" :label-width="formLabelWidth">
+                <el-select placeholder="请选择" class="form-horizontal" v-model="medicalAdvice.typeNo">
+                    <el-option :label="item.medicalAdviceName" :value="item.medicalAdviceNo" v-for="item in medicalAdviceTypes"></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="开嘱时间" :label-width="formLabelWidth">
+                <el-date-picker
+                        v-model="medicalAdvice.startTime"
+                        type="datetime"
+                        placeholder="选择日期时间"
+                        align="right"
+                        :picker-options="pickerOptions">
+                </el-date-picker>
+            </el-form-item>
+            <el-form-item label="停嘱时间" :label-width="formLabelWidth">
+                <el-date-picker
+                        v-model="medicalAdvice.endTime"
+                        type="datetime"
+                        placeholder="选择日期时间"
+                        align="right"
+                        :picker-options="pickerOptions">
+                </el-date-picker>
+            </el-form-item>
+            <el-form-item label="最后执行时间" :label-width="formLabelWidth">
+                <el-date-picker
+                        v-model="medicalAdvice.endExcuteTime"
+                        type="datetime"
+                        placeholder="选择日期时间"
+                        align="right"
+                        :picker-options="pickerOptions">
+                </el-date-picker>
+            </el-form-item>
+            <el-form-item label="用药原因" :label-width="formLabelWidth">
+                <el-input placeholder="请输入用药原因"  v-model="medicalAdvice.cause" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="用药目的" :label-width="formLabelWidth">
+                <el-input placeholder="请输入用药目的"  v-model="medicalAdvice.goal" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="单次剂量" :label-width="formLabelWidth">
+                <el-input oninput ="value=value.replace(/[^0-9.]/g,'')" placeholder="请输入单次剂量"  v-model="medicalAdvice.signall" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="计量单位" :label-width="formLabelWidth">
+                <el-input placeholder="请输入计量单位"  v-model="medicalAdvice.unit" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="使用频次" :label-width="formLabelWidth">
+                <el-input placeholder="请输入使用频次"  v-model="medicalAdvice.frequency" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="用药途径" :label-width="formLabelWidth">
+                <el-input placeholder="请输入用药途径"  v-model="medicalAdvice.route" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="是否是抗生素" :label-width="formLabelWidth">
+                <el-input type="number" placeholder="（0：是，1：否）"  v-model="medicalAdvice.antibiotic" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="医嘱说明" :label-width="formLabelWidth">
+                <el-input placeholder="请输入医嘱说明"  v-model="medicalAdvice.instruction" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="备注" :label-width="formLabelWidth">
+                <el-input placeholder="请输入备注"  v-model="medicalAdvice.remark" auto-complete="off"></el-input>
+            </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="MedicalAdviceAddCancel">取 消</el-button>
+            <el-button type="primary" @click="MedicalAdviceAddOk">确 定</el-button>
+        </div>
+    </el-dialog>
+    <el-dialog  title="修改医嘱信息" :show-close="false" :visible.sync="medicalAdviceUpdDialogFormVisible">
+        <el-form :model="medicalAdvice">
+            <el-form-item label="病人编号" :label-width="formLabelWidth">
+                <el-input :disabled="true" placeholder="请输入病人编号" v-model="medicalAdvice.patientId" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="医嘱名称" :label-width="formLabelWidth">
+                <el-input placeholder="请输入医嘱名称" v-model="medicalAdvice.medicalAdviceName" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="医嘱类型" :label-width="formLabelWidth">
+                <el-select placeholder="请选择" class="form-horizontal" v-model="medicalAdvice.typeNo">
+                    <el-option :label="item.medicalAdviceName" :value="item.medicalAdviceNo" v-for="item in medicalAdviceTypes"></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="开嘱时间" :label-width="formLabelWidth">
+                <el-date-picker
+                        value-format="yyyy-MM-dd HH:mm:ss"
+                        v-model="medicalAdvice.startTime"
+                        type="datetime"
+                        placeholder="选择日期时间"
+                        align="right"
+                        :picker-options="pickerOptions"
+                        >
+                </el-date-picker>
+                <!--<el-input placeholder="选择日期时间" type="dateTime" v-model="medicalAdvice.startTime1"></el-input>-->
+            </el-form-item>
+            <el-form-item label="停嘱时间" :label-width="formLabelWidth">
+                <el-date-picker
+                        value-format="yyyy-MM-dd HH:mm:ss"
+                        v-model="medicalAdvice.endTime"
+                        type="datetime"
+                        placeholder="选择日期时间"
+                        align="right"
+                        :picker-options="pickerOptions">
+                </el-date-picker>
+            </el-form-item>
+            <el-form-item label="最后执行时间" :label-width="formLabelWidth">
+                <el-date-picker
+                        value-format="yyyy-MM-dd HH:mm:ss"
+                        v-model="medicalAdvice.endExcuteTime"
+                        type="datetime"
+                        placeholder="选择日期时间"
+                        align="right"
+                        :picker-options="pickerOptions">
+                </el-date-picker>
+            </el-form-item>
+            <el-form-item label="用药原因" :label-width="formLabelWidth">
+                <el-input placeholder="请输入用药原因"  v-model="medicalAdvice.cause" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="用药目的" :label-width="formLabelWidth">
+                <el-input placeholder="请输入用药目的"  v-model="medicalAdvice.goal" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="单次剂量" :label-width="formLabelWidth">
+                <el-input placeholder="请输入单次剂量"  v-model="medicalAdvice.signall" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="计量单位" :label-width="formLabelWidth">
+                <el-input placeholder="请输入计量单位"  v-model="medicalAdvice.unit" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="使用频次" :label-width="formLabelWidth">
+                <el-input placeholder="请输入使用频次"  v-model="medicalAdvice.frequency" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="用药途径" :label-width="formLabelWidth">
+                <el-input placeholder="请输入用药途径"  v-model="medicalAdvice.route" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="是否是抗生素" :label-width="formLabelWidth">
+                <el-input type="number" placeholder="（0：是，1：否）"  v-model="medicalAdvice.antibiotic" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="医嘱说明" :label-width="formLabelWidth">
+                <el-input placeholder="请输入医嘱说明"  v-model="medicalAdvice.instruction" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="备注" :label-width="formLabelWidth">
+                <el-input placeholder="请输入备注"  v-model="medicalAdvice.remark" auto-complete="off"></el-input>
+            </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="MedicalAdviceUpdCancel">取 消</el-button>
+            <el-button type="primary" @click="MedicalAdviceUpdOk">确 定</el-button>
+        </div>
+    </el-dialog>
+
+    <el-dialog  width="50%" title="添加病历信息" :show-close="false" :visible.sync="caseListAddDialogFormVisible">
+
+        <el-form :model="caseList">
+            <el-form-item label="病人编号" :label-width="formLabelWidth">
+                <el-input type="number" placeholder="请输入病人编号" v-model="caseList.patientId" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="病程名称" :label-width="formLabelWidth">
+                <el-input placeholder="请输入病程名称" v-model="caseList.caseName" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="记录时间" :label-width="formLabelWidth">
+                <el-date-picker
+                        v-model="caseList.recordTime"
+                        type="datetime"
+                        placeholder="选择日期时间"
+                        align="right"
+                        :picker-options="pickerOptions">
+                </el-date-picker>
+            </el-form-item>
+            <el-form-item label="病程内容" :label-width="formLabelWidth">
+                <el-input placeholder="请输入病程内容" type="textarea" v-model="caseList.content" auto-complete="off"></el-input>
+            </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="caseListAddCancel">取 消</el-button>
+            <el-button type="primary" @click="caseListAddOk">确 定</el-button>
+        </div>
+    </el-dialog>
+
+
+    <!-- shop-area-end -->
+    <!-- shop-area-end -->
+</main>
+<!-- main-area-end -->
+<!-- footer -->
+
+<!-- footer-end -->
+<div class="footerpage_m"></div>
+
+<!-- JS here -->
+<!-- JS here -->
+<script src="../../js/vendor/modernizr-3.5.0.min.js"></script>
+<script src="../../js/vendor/jquery-1.12.4.min.js"></script>
+<script src="../../js/popper.min.js"></script>
+<script src="../../js/bootstrap.min.js"></script>
+<script src="../../js/one-page-nav-min.js"></script>
+<script src="../../js/jquery.meanmenu.min.js"></script>
+<script src="../../js/slick.min.js"></script>
+<script src="../../js/ajax-form.js"></script>
+<script src="../../js/paroller.js"></script>
+<script src="../../js/wow.min.js"></script>
+<script src="../../js/js_isotope.pkgd.min.js"></script>
+<script src="../../js/imagesloaded.min.js"></script>
+<script src="../../js/parallax.min.js"></script>
+<script src="../../js/jquery.waypoints.min.js"></script>
+<script src="../../js/jquery.counterup.min.js"></script>
+<script src="../../js/jquery.scrollUp.min.js"></script>
+<script src="../../js/parallax-scroll.js"></script>
+<script src="../../js/jquery.magnific-popup.min.js"></script>
+<script src="../../js/element-in-view.js"></script>
+<script src="../../js/main.js"></script>
+<!--<script src="https://cdn.bootcdn.net/ajax/libs/wangEditor/3.1.1/wangEditor.js"></script>-->
+
+<script>
+    $(function () {
+
+        //调用公共代码
+        $('.footerpage_m').load('/commons/footer.html');
+        $('.headerpage_m').load('/commons/header.html');
+
+        $(".exit").click(function logout() {
+            $.ajax({
+                type: "post",
+                url: "/logout",
+                dataType: "json",
+                data: {},
+                success: function (res) {
+                    if (res.code == 200) {
+                        window.location.href = "http://192.168.150.130:8089/pages/login.html";
+                    } else {
+                        alert("退出失败")
+                    }
+                }
+            })
+        })
+
+        new Vue({
+            el: "#dcims",
+            data: {
+                editor:null,
+                localhost: "http://192.168.150.130:8089",
+                total: 0,
+                pagesize: 3,
+                currentPage: 1,
+                Atotal: 0,
+                Apagesize: 4,
+                AcurrentPage: 1,
+                Btotal: 0,
+                Bpagesize: 4,
+                BcurrentPage: 1,
+                Ctotal: 0,
+                Cpagesize: 4,
+                CcurrentPage: 1,
+                pickerOptions: {
+                    shortcuts: [{
+                        text: '今天',
+                        onClick(picker) {
+                            picker.$emit('pick', new Date());
+                        }
+                    }, {
+                        text: '昨天',
+                        onClick(picker) {
+                            const date = new Date();
+                            date.setTime(date.getTime() - 3600 * 1000 * 24);
+                            picker.$emit('pick', date);
+                        }
+                    }, {
+                        text: '一周前',
+                        onClick(picker) {
+                            const date = new Date();
+                            date.setTime(date.getTime() - 3600 * 1000 * 24 * 7);
+                            picker.$emit('pick', date);
+                        }
+                    }]
+                },
+                operations: [],
+                operation: {
+                    patientId: "",
+                    operationName: "",
+                    operateTime: "",
+                    operationDate: "",
+                    grade: "",
+                    nextDate: ""
+                },
+                operationFollowAddDialogFormVisible: false,
+                operationAddDialogFormVisible: false,
+                checkLists: [],
+                checkList: {
+                    patientId: "",
+                    checkTime: "",
+                    remark: "",
+                    specimenName: ""
+                },
+                checkTypes: [],
+                checkListAddDialogFormVisible: false,
+                checkResultListAddDialogFormVisible: false,
+                checkResultLists: [],
+                checkResultList: {
+                    checkNo: "",
+                    resultTime: "",
+                    checkName: "",
+                    checkResult: "",
+                    unit: "",
+                    range: ""
+                },
+                checkResultListLookDialogFormVisible: false,
+                checkPathogenAddDialogFormVisible: false,
+                checkPathogenLookDialogFormVisible: false,
+                checkPathogens:[],
+                checkPathogen:{
+                    pathogenNo:"",
+                    checkresultId:"",
+                    date:"",
+                    content:""
+                },
+                pathogens:[],
+                resultMedical:{
+                    checkresultId:"",
+                    medicalName:"",
+                    result:""
+                },
+                resultMedicalAddDialogFormVisible: false,
+                resultMedicalLookDialogFormVisible: false,
+                resultMedicals:[],
+                medicalAdvices:[],
+                medicalAdviceTypes:[],
+                medicalAdvice:{
+                    id:"",
+                    patientId:"",
+                    typeNo:"",
+                    startTime:"",
+                    endTime:"",
+                    endExcuteTime:"",
+                    medicalAdviceName:"",
+                    cause:"",
+                    goal:"",
+                    signall:"",
+                    unit:"",
+                    frequency:"",
+                    route:"",
+                    doctorNo:"",
+                    antibiotic:"",
+                    instruction:"",
+                    remark:"",
+                },
+                medicalAdviceAddDialogFormVisible: false,
+                medicalAdviceUpdDialogFormVisible: false,
+                caseList:{
+                    patientId:"",
+                    recordTime:"",
+                    caseName:"",
+                    content:""
+                },
+                caseLists:[],
+                caseListAddDialogFormVisible: false,
+                patientId: "",
+                C_patientId:"",
+                Y_patientId:"",
+                formLabelWidth: "120px",
+                user: {},
+                nowDate: "",
+                isLoading: true,
+                dialogFormVisible: false,
+                editorOption:{
+                    theme: 'snow',
+                    boundary: document.body,
+                    modules: {
+                        toolbar: [
+                            ['bold', 'italic', 'underline', 'strike'],
+                            ['blockquote', 'code-block'],
+                            [{ 'header': 1 }, { 'header': 2 }],
+                            [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                            [{ 'script': 'sub' }, { 'script': 'super' }],
+                            [{ 'indent': '-1' }, { 'indent': '+1' }],
+                            [{ 'direction': 'rtl' }],
+                            [{ 'size': ['small', false, 'large', 'huge'] }],
+                            [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                            [{ 'color': [] }, { 'background': [] }],
+                            [{ 'font': [] }],
+                            [{ 'align': [] }],
+                            ['clean'],
+                            ['link', 'image', 'video']
+                        ]
+                    },
+                    placeholder: 'Insert text here ...',
+                    readOnly: false
+                }
+            },
+            methods: {
+                handleTimestamp:function(val){
+                    this.medicalAdvice.startTime1=val;
+                },
+                test: function (data) {
+                    // this.total = 0;
+                    this.currentPage = 1
+                    var index = data.index;
+                    if (index == 0) {
+                        this.getOperations()
+                    } else if (index == 1) {
+                        this.getCheckLists()
+                    } else if (index == 2) {
+                        this.getMedicalAdvices()
+                    } else if (index == 3) {
+                        this.getCaseLists()
+                    } else if (index == 4) {
+
+                    } else if (index == 5) {
+
+                    } else if (index == 6) {
+
+                    }
+                },
+                getOperations: function () {
+                    var that = this;
+                    $.ajax({
+                        url: this.localhost + "/doctor/findAllOperationsByDno",
+                        type: "post",
+                        data: {},
+                        success: function (res) {
+                            that.operations = res.operations
+                            that.total = that.operations.length
+                            that.isLoading = false
+                        }
+                    })
+                }
+                ,
+                current_change: function (currentPage) {
+                    this.currentPage = currentPage;
+                }
+                ,
+                current_changeA: function (currentPage) {
+                    this.AcurrentPage = currentPage;
+                }
+                ,
+                current_changeB: function (currentPage) {
+                    this.BcurrentPage = currentPage;
+                }
+                ,
+                current_changeC: function (currentPage) {
+                    this.CcurrentPage = currentPage;
+                }
+                ,
+                addOperationFollow: function (operation) {
+                    this.operation = {
+                        patientId: "",
+                        operationName: "",
+                        operateTime: "",
+                        operationDate: "",
+                        grade: "",
+                        nextDate: ""
+                    }
+                    this.operation.operationDate = operation.operateTime;
+                    this.operation.grade = operation.grade;
+                    this.operation.patientId = operation.patientId;
+                    this.operation.operateTime = operation.operateTime;
+                    this.operation.operationName = operation.operationName;
+                    this.operationFollowAddDialogFormVisible = true
+                }
+                ,
+                addOperation: function () {
+                    this.operation = {
+                        patientId: "",
+                        operationName: "",
+                        operateTime: "",
+                        operationDate: "",
+                        grade: "",
+                        nextDate: ""
+                    }
+                    this.operationAddDialogFormVisible = true;
+                }
+                ,
+                operationAddOk: function () {
+                    if (this.operation.patientId == ""
+                        || this.operation.operationName == ""
+                        || this.operation.operationTime == ""
+                        || this.operation.grade == "") {
+                        this.$message({
+                            message: '请将信息填写完整',
+                            center: true,
+                            type: 'success'
+                        });
+                        return;
+                    }
+                    var that = this;
+                    $.ajax({
+                        url: this.localhost + "/doctor/insOperation",
+                        type: "post",
+                        dataType: "JSON",
+                        data: this.operation,
+                        success: function (res) {
+                            that.isLoading = false
+                            if (res.flag) {
+                                that.$message({
+                                    message: '添加成功',
+                                    center: true,
+                                    type: 'success'
+                                });
+                                that.getOperations()
+                            } else {
+                                that.$message({
+                                    message: '添加失败',
+                                    center: true,
+                                    type: 'error'
+                                });
+                            }
+
+                        }
+                    })
+                    this.operationAddDialogFormVisible = false;
+
+                }
+                ,
+                operationAddCancel: function () {
+                    this.operationAddDialogFormVisible = false;
+                }
+                ,
+                operationFollowAddOk: function () {
+                    if (this.operation.nextDate == "") {
+                        this.$message({
+                            message: '请将信息填写完整',
+                            center: true,
+                            type: 'success'
+                        });
+                        return;
+                    }
+                    var that = this;
+                    $.ajax({
+                        url: this.localhost + "/doctor/insOperationFollow",
+                        type: "post",
+                        dataType: "JSON",
+                        data: this.operation,
+                        success: function (res) {
+
+                            that.isLoading = false
+                            if (res.flag) {
+                                that.$message({
+                                    message: '信息修改成功',
+                                    center: true,
+                                    type: 'success'
+                                });
+                                that.getOperations()
+                            } else {
+                                that.$message({
+                                    message: '信息修改失败',
+                                    center: true,
+                                    type: 'error'
+                                });
+                            }
+
+                        }
+                    })
+                    this.operationFollowAddDialogFormVisible = false;
+
+                }
+                ,
+                operationFollowAddCancel: function () {
+                    this.operationFollowAddDialogFormVisible = false;
+                },
+
+
+                getCheckLists: function () {
+
+                    if(this.patientId!=""&&!isNaN(this.patientId)){
+                        this.$message({
+                            message: '请输入正确病人编号进行查询',
+                            center: true,
+                            type: 'warning'
+                        });
+                        return
+                    }
+                    var that = this;
+                    $.ajax({
+                        url: this.localhost + "/doctor/findAllCheckListsByPid",
+                        type: "post",
+                        data: {
+                            patientId: this.patientId
+                        },
+                        success: function (res) {
+                            if (res.flag == false) {
+                                that.$alert('该医生管理的病人编号不存在', '输入错误', {
+                                    confirmButtonText: '确定',
+                                    callback: action => {
+                                        /*that.$message({
+                                            type: 'info',
+                                            message: `action: ${action}`
+                                        });*/
+                                    }
+                                });
+                                return;
+                            }
+                            that.checkLists = res.checkLists
+                            that.total = that.checkLists.length
+                            that.isLoading = false
+                        }
+                    })
+                }
+                ,
+                getCheckResultLists: function (checkNo) {
+                    var that = this;
+                    $.ajax({
+                        url: this.localhost + "/doctor/findAllCheckResultListsByCno",
+                        type: "post",
+                        data: {
+                            checkNo: checkNo
+                        },
+                        success: function (res) {
+                            that.checkResultLists = res.checkResultLists
+                            that.Atotal = that.checkResultLists.length
+                        }
+                    })
+                }
+                ,
+                getCheckTypes: function () {
+                    var that = this;
+                    $.ajax({
+                        url: this.localhost + "/doctor/findAllCheckTypes",
+                        type: "post",
+                        data: {},
+                        success: function (res) {
+                            that.checkTypes = res.checkTypes
+                        }
+                    })
+                }
+                ,
+                addCheckList: function () {
+                    this.checkList = {
+                        patientId: "",
+                        checkTime: "",
+                        remark: "",
+                        specimenName: ""
+                    }
+                    this.getCheckTypes()
+                    this.checkListAddDialogFormVisible = true;
+                }
+                ,
+                checkListAddOk: function () {
+                    if (this.checkList.patientId == ""
+                        || this.checkList.checkTime == ""
+                        || this.checkList.specimenName == "") {
+                        this.$message({
+                            message: '请将信息填写完整',
+                            center: true,
+                            type: 'success'
+                        });
+                        return;
+                    }
+                    /*var split=this.checkList.specimenName
+                    console.log("1:"+split[0])*/
+
+                    var that = this;
+                    $.ajax({
+                        url: this.localhost + "/doctor/insCheckList",
+                        type: "post",
+                        dataType: "JSON",
+                        data: this.checkList,
+                        success: function (res) {
+                            that.isLoading = false
+                            if (res.flag) {
+                                that.$message({
+                                    message: '添加成功',
+                                    center: true,
+                                    type: 'success'
+                                });
+                                that.patientId=that.checkList.patientId
+                                that.getCheckLists()
+                            } else {
+                                that.$message({
+                                    message: '添加失败,操作医生为管理此病人id',
+                                    center: true,
+                                    type: 'error'
+                                });
+                            }
+
+                        }
+                    })
+                    this.checkListAddDialogFormVisible = false;
+
+                }
+                ,
+                checkListAddCancel: function () {
+                    this.checkListAddDialogFormVisible = false;
+                }
+                ,
+                addCheckResultList: function (checkList) {
+                    this.checkResultList = {
+                        checkNo: "",
+                        resultTime: "",
+                        checkName: "",
+                        checkResult: "",
+                        unit: "",
+                        range: ""
+                    }
+                    this.checkResultList.checkNo = checkList.checkNo
+                    this.checkResultListAddDialogFormVisible = true;
+                },
+                checkResultListAddOk: function () {
+                    if (this.checkResultList.resultTime == ""
+                        || this.checkResultList.checkName == ""
+                        || this.checkResultList.checkResult == ""
+                        || this.checkResultList.unit == ""
+                        || this.checkResultList.range == "") {
+                        this.$message({
+                            message: '请将信息填写完整',
+                            center: true,
+                            type: 'success'
+                        });
+                        return;
+                    }
+                    var that = this;
+                    $.ajax({
+                        url: this.localhost + "/doctor/insCheckResultList",
+                        type: "post",
+                        dataType: "JSON",
+                        data: this.checkResultList,
+                        success: function (res) {
+                            that.isLoading = false
+                            if (res.flag) {
+                                that.$message({
+                                    message: '添加成功',
+                                    center: true,
+                                    type: 'success'
+                                });
+                                that.getCheckLists()
+                            } else {
+                                that.$message({
+                                    message: '添加失败',
+                                    center: true,
+                                    type: 'error'
+                                });
+                            }
+
+                        }
+                    })
+                    this.checkResultListAddDialogFormVisible = false;
+
+                }
+                ,
+                checkResultListAddCancel: function () {
+                    this.checkResultListAddDialogFormVisible = false;
+                }
+                ,
+                lookCheckResultList: function (checkList) {
+                    this.AcurrentPage = 1
+                    this.getCheckResultLists(checkList.checkNo)
+                    this.checkResultListLookDialogFormVisible = true;
+                },
+                checkResultListLookOk: function () {
+                    this.checkResultListLookDialogFormVisible = false;
+                }
+                ,
+                getCheckPathogens: function () {
+                    var that = this;
+                    $.ajax({
+                        url: this.localhost + "/doctor/findAllCheckPathogens",
+                        type: "post",
+                        data: {
+                            checkresultId:this.checkPathogen.checkresultId
+                        },
+                        success: function (res) {
+                            that.checkPathogens = res.checkPathogens
+                            that.Btotal=that.checkPathogens.length
+                        }
+                    })
+                }
+                ,
+                getPathogens: function () {
+                    var that = this;
+                    $.ajax({
+                        url: this.localhost + "/doctor/findAllPathogens",
+                        type: "post",
+                        data: {},
+                        success: function (res) {
+                            that.pathogens = res.pathogens
+                        }
+                    })
+                }
+                ,
+                lookCheckPathogen: function (checkResult) {
+                    this.checkPathogen.checkresultId=checkResult.id
+                    this.BcurrentPage = 1
+                    this.getCheckPathogens()
+                    this.checkPathogenLookDialogFormVisible = true;
+                },
+                checkPathogenLookOk: function () {
+                    this.checkPathogenLookDialogFormVisible = false;
+                }
+                ,
+                addCheckPathogen : function () {
+                    this.checkPathogen.pathogenNo=""
+                    this.checkPathogen.content=""
+                    this.checkPathogen.date=""
+                    this.getPathogens();
+                    this.checkPathogenAddDialogFormVisible = true;
+                }
+                ,
+                checkPathogenAddCancel: function () {
+                    this.checkPathogenAddDialogFormVisible = false;
+                }
+                ,
+                checkPathogenAddOk: function () {
+                    if (this.checkPathogen.pathogenNo == ""
+                        || this.checkPathogen.date == "") {
+                        this.$message({
+                            message: '请将信息填写完整',
+                            center: true,
+                            type: 'success'
+                        });
+                        return;
+                    }
+
+                    var that = this;
+                    $.ajax({
+                        url: this.localhost + "/doctor/insCheckPathogen",
+                        type: "post",
+                        dataType: "JSON",
+                        data: this.checkPathogen,
+                        success: function (res) {
+                            that.isLoading = false
+                            if (res.flag) {
+                                that.$message({
+                                    message: '添加成功',
+                                    center: true,
+                                    type: 'success'
+                                });
+                                that.getCheckPathogens()
+                            } else {
+                                that.$message({
+                                    message: '添加失败',
+                                    center: true,
+                                    type: 'error'
+                                });
+                            }
+
+                        }
+                    })
+                    this.checkPathogenAddDialogFormVisible = false;
+                }
+                ,
+                addResultMedical : function () {
+                    this.resultMedical.medicalName=""
+                    this.resultMedical.result=""
+                    this.resultMedicalAddDialogFormVisible = true;
+                }
+                ,
+                ResultMedicalAddCancel: function () {
+                    this.resultMedicalAddDialogFormVisible = false;
+                }
+                ,
+                ResultMedicalAddOk: function () {
+                    if (this.resultMedical.medicalName == ""
+                        || this.resultMedical.result == "") {
+                        this.$message({
+                            message: '请将信息填写完整',
+                            center: true,
+                            type: 'success'
+                        });
+                        return;
+                    }
+
+                    var that = this;
+                    $.ajax({
+                        url: this.localhost + "/doctor/insResultMedical",
+                        type: "post",
+                        dataType: "JSON",
+                        data: this.resultMedical,
+                        success: function (res) {
+                            that.isLoading = false
+                            if (res.flag) {
+                                that.$message({
+                                    message: '添加成功',
+                                    center: true,
+                                    type: 'success'
+                                });
+                                that.getResultMedicals()
+                            } else {
+                                that.$message({
+                                    message: '添加失败',
+                                    center: true,
+                                    type: 'error'
+                                });
+                            }
+
+                        }
+                    })
+                    this.resultMedicalAddDialogFormVisible = false;
+                }
+                ,
+                getResultMedicals: function () {
+                    var that = this;
+                    $.ajax({
+                        url: this.localhost + "/doctor/findAllResultMedicals",
+                        type: "post",
+                        data: {
+                            checkresultId:this.resultMedical.checkresultId
+                        },
+                        success: function (res) {
+                            that.resultMedicals = res.resultMedicals
+                            that.Ctotal=that.resultMedicals.length
+                        }
+                    })
+                }
+                ,
+                lookResultMedical: function (checkResult) {
+                    this.resultMedical.checkresultId=checkResult.id
+                    this.CcurrentPage = 1
+                    this.getResultMedicals()
+                    this.resultMedicalLookDialogFormVisible = true;
+                }
+                ,
+                ResultMedicalLookOk: function () {
+                    this.resultMedicalLookDialogFormVisible = false;
+                }
+                ,
+                addMedicalAdvice : function () {
+                    this.medicalAdvice={
+                        id:"",
+                        patientId:this.Y_patientId,
+                        typeNo:"",
+                        startTime:"",
+                        endTime:"",
+                        endExcuteTime:"",
+                        medicalAdviceName:"",
+                        cause:"",
+                        goal:"",
+                        signall:"",
+                        unit:"",
+                        frequency:"",
+                        route:"",
+                        doctorNo:"",
+                        antibiotic:"",
+                        instruction:"",
+                        remark:"",
+                    };
+                    this.getMedicalAdviceTypes()
+                    this.medicalAdviceAddDialogFormVisible = true;
+                }
+                ,
+                MedicalAdviceAddCancel: function () {
+                    this.medicalAdviceAddDialogFormVisible = false;
+                }
+                ,
+                MedicalAdviceAddOk: function () {
+                   /* if (this.resultMedical.medicalName == ""
+                        || this.resultMedical.result == "") {
+                        this.$message({
+                            message: '请将信息填写完整',
+                            center: true,
+                            type: 'success'
+                        });
+                        return;
+                    }*/
+
+                    var that = this;
+                    $.ajax({
+                        url: this.localhost + "/doctor/insMedicalAdvice",
+                        type: "post",
+                        dataType: "JSON",
+                        data: this.medicalAdvice,
+                        success: function (res) {
+                            that.isLoading = false
+                            if (res.flag) {
+                                that.$message({
+                                    message: '添加成功',
+                                    center: true,
+                                    type: 'success'
+                                });
+                                that.Y_patientId=that.medicalAdvice.patientId
+                                that.getMedicalAdvices()
+                            } else {
+                                that.$message({
+                                    message: '添加失败',
+                                    center: true,
+                                    type: 'error'
+                                });
+                            }
+
+                        }
+                    })
+                    this.medicalAdviceAddDialogFormVisible = false;
+                }
+                ,
+                getMedicalAdvices: function () {
+                    if(this.Y_patientId!=""&&!isNaN(this.Y_patientId)){
+                        this.$message({
+                            message: '请输入正确病人编号进行查询',
+                            center: true,
+                            type: 'warning'
+                        });
+                        return
+                    }
+                    var that = this;
+                    $.ajax({
+                        url: this.localhost + "/doctor/findAllMedicalAdvicesByPid",
+                        type: "post",
+                        data: {
+                            patientId:this.Y_patientId
+                        },
+                        success: function (res) {
+                            if (res.flag == false) {
+                                that.$alert('该医生管理的病人编号不存在', '输入错误', {
+                                    confirmButtonText: '确定',
+                                    callback: action => {
+                                        /*that.$message({
+                                            type: 'info',
+                                            message: `action: ${action}`
+                                        });*/
+                                    }
+                                });
+                                that.medicalAdvices=[]
+                                return;
+                            }
+                            that.medicalAdvices = res.medicalAdvices
+                            that.total=that.medicalAdvices.length
+                        }
+                    })
+                }
+                ,
+                getMedicalAdviceTypes: function () {
+                    var that = this;
+                    $.ajax({
+                        url: this.localhost + "/doctor/findAllMedicalAdviceTypes",
+                        type: "post",
+                        data: {
+                        },
+                        success: function (res) {
+                            that.medicalAdviceTypes = res.medicalAdviceTypes
+                        }
+                    })
+                }
+                ,
+                updMedicalAdvice : function (medicalAdvice) {
+                    // var medicalAdvice1=JSON.parse(JSON.stringify(medicalAdvice));
+                    this.medicalAdvice={
+                        id:medicalAdvice.id,
+                        patientId:medicalAdvice.patientId,
+                        typeNo:medicalAdvice.typeNo,
+                        startTime:new Date(medicalAdvice.startTime),
+                        endTime:new Date(medicalAdvice.endTime),
+                        endExcuteTime:new Date(medicalAdvice.endExcuteTime),
+                        medicalAdviceName:medicalAdvice.medicalAdviceName,
+                        cause:medicalAdvice.cause,
+                        goal:medicalAdvice.goal,
+                        signall:medicalAdvice.signall,
+                        unit:medicalAdvice.unit,
+                        frequency:medicalAdvice.frequency,
+                        route:medicalAdvice.route,
+                        doctorNo:medicalAdvice.doctorNo,
+                        antibiotic:medicalAdvice.antibiotic,
+                        instruction:medicalAdvice.instruction,
+                        remark:medicalAdvice.remark,
+                    };
+                    this.getMedicalAdviceTypes()
+                    this.medicalAdviceUpdDialogFormVisible = true;
+                }
+                ,
+                MedicalAdviceUpdCancel: function () {
+                    this.medicalAdviceUpdDialogFormVisible = false;
+                }
+                ,
+                MedicalAdviceUpdOk: function () {
+                    /* if (this.resultMedical.medicalName == ""
+                         || this.resultMedical.result == "") {
+                         this.$message({
+                             message: '请将信息填写完整',
+                             center: true,
+                             type: 'success'
+                         });
+                         return;
+                     }*/
+
+                    var that = this;
+                    $.ajax({
+                        url: this.localhost + "/doctor/updMedicalAdvice",
+                        type: "post",
+                        dataType: "JSON",
+                        data: this.medicalAdvice,
+                        success: function (res) {
+                            that.isLoading = false
+                            if (res.flag) {
+                                that.$message({
+                                    message: '添加成功',
+                                    center: true,
+                                    type: 'success'
+                                });
+                                that.getMedicalAdvices()
+                            } else {
+                                that.$message({
+                                    message: '添加失败',
+                                    center: true,
+                                    type: 'error'
+                                });
+                            }
+
+                        }
+                    })
+                    this.medicalAdviceUpdDialogFormVisible = false;
+                }
+                ,
+
+                addCaseList : function () {
+                    this.caseList={
+                        patientId:"",
+                        recordTime:"",
+                        caseName:"",
+                        content:""
+                    };
+                    this.caseListAddDialogFormVisible = true;
+                }
+                ,
+                caseListAddCancel: function () {
+                    this.caseListAddDialogFormVisible = false;
+                }
+                ,
+                caseListAddOk: function () {
+
+                     if (this.caseList.patientId == ""
+                         || this.caseList.recordTime == ""
+                         || this.caseList.caseName == ""
+                         || this.caseList.content == "") {
+                         this.$message({
+                             message: '请将信息填写完整',
+                             center: true,
+                             type: 'success'
+                         });
+                         return;
+                     }
+
+                    var that = this;
+                    $.ajax({
+                        url: this.localhost + "/doctor/insCaseList",
+                        type: "post",
+                        dataType: "JSON",
+                        data: this.caseList,
+                        success: function (res) {
+                            that.isLoading = false
+                            if (res.flag) {
+                                that.$message({
+                                    message: '添加成功',
+                                    center: true,
+                                    type: 'success'
+                                });
+                                that.C_patientId=that.caseList.patientId
+                                that.getCaseLists()
+                            } else {
+                                that.$message({
+                                    message: '添加失败',
+                                    center: true,
+                                    type: 'error'
+                                });
+                            }
+
+                        }
+                    })
+                    this.caseListAddDialogFormVisible = false;
+                }
+                ,
+                getCaseLists: function () {
+                    if(this.C_patientId!=""&&!isNaN(this.C_patientId)){
+                        this.$message({
+                            message: '请输入正确病人编号进行查询',
+                            center: true,
+                            type: 'warning'
+                        });
+                        return
+                    }
+                    var that = this;
+                    $.ajax({
+                        url: this.localhost + "/doctor/findAllCaseListsByPid",
+                        type: "post",
+                        data: {
+                            patientId:this.C_patientId
+                        },
+                        success: function (res) {
+                            if (res.flag == false) {
+                                that.$alert('该医生管理的病人编号不存在', '输入错误', {
+                                    confirmButtonText: '确定',
+                                    callback: action => {
+                                        /*that.$message({
+                                            type: 'info',
+                                            message: `action: ${action}`
+                                        });*/
+                                    }
+                                });
+                                that.caseLists=[]
+                                return;
+                            }
+                            that.caseLists = res.caseLists
+                            that.total=that.caseLists.length
+                        }
+                    })
+                }
+                ,
+            },
+            created: function () {
+                Date.prototype.format = function (format) {
+                    var o = {
+                        "M+": this.getMonth() + 1, //month
+                        "d+": this.getDate(), //day
+                        "h+": this.getHours(), //hour
+                        "m+": this.getMinutes(), //minute
+                        "s+": this.getSeconds(), //second
+                        "q+": Math.floor((this.getMonth() + 3) / 3), //quarter
+                        "S": this.getMilliseconds() //millisecond
+                    }
+                    if (/(y+)/.test(format)) {
+                        format = format.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+                    }
+                    for (var k in o) {
+                        if (new RegExp("(" + k + ")").test(format)) {
+                            format = format.replace(RegExp.$1, RegExp.$1.length == 1 ? o[k] : ("00" + o[k]).substr(("" + o[k]).length));
+                        }
+                    }
+                    return format;
+                }
+                this.nowDate = new Date().format("yyyy年MM月dd日 hh:mm:ss")
+                this.getOperations()
+                var that=this
+                $.ajax({
+                    url: this.localhost + "/user/getUser",
+                    type: "post",
+                    data: {},
+                    success: function (res) {
+                        that.user = res.user
+                        $(".username-show").text(that.user.name)
+                    }
+                })
+            }
+        })
+    })
+
+</script>
+</body>
+</html>

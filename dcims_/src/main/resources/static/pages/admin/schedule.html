@@ -1,0 +1,673 @@
+<!doctype html>
+<html class="no-js" lang="zxx">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>医院感染信息监测系统 </title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Place favicon.ico in the root Internist, General Practitonery -->
+
+    <!-- CSS here -->
+    <link rel="stylesheet" href="../../css/bootstrap.min.css">
+    <link rel="stylesheet" href="../../css/animate.min.css">
+    <link rel="stylesheet" href="../../css/magnific-popup.css">
+    <link rel="stylesheet" href="../../fontawesome/css/all.min.css">
+    <link rel="stylesheet" href="../../css/dripicons.css">
+    <link rel="stylesheet" href="../../css/slick.css">
+    <link rel="stylesheet" href="../../css/default.css">
+    <link rel="stylesheet" href="../../css/meanmenu.css">
+    <link rel="stylesheet" href="../../css/style.css">
+
+
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <script src="/js/jquery-3.3.1.min.js"></script>
+    <script src="/js/vue.min.js"></script>
+    <script src="/js/axios.js"></script>
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+
+
+    <link rel="stylesheet" href="../../css/responsive.css">
+    <style type="text/css">
+        .user {
+            display: inline;
+        }
+
+        .patient {
+            width: 350px;
+            /* height: 400px; */
+            background-color: #D9E6F5;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /*动画加载*/
+        .loading {
+            position: fixed;
+            left: 0;
+            top: 0;
+            /*background: url('/img/three-dots.svg') center center no-repeat #fff;*/
+            background-color: white;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1000;
+            /*opacity: 0.8;*/
+        }
+
+        .main {
+            height: 100px;
+            width: 100px;
+            margin: 200px auto
+        }
+
+        .main div {
+            color: #799761;
+            margin: 50px auto;
+        }
+
+        svg {
+            fill: none
+        }
+
+        .load {
+            stroke-width: 15px;
+            stroke-dasharray: 252;
+            stroke-dashoffset: 0;
+            animation: load 1.5s ease-in-out infinite;
+            transform-origin: center center
+
+        }
+
+        .one {
+            stroke: #b8d8d7;
+        }
+
+        .two {
+            stroke: #73c0b0;
+            animation-delay: 0.1s;
+        }
+
+        .three {
+            stroke: #4d8f8e;
+            animation-delay: 0.2s
+        }
+
+        @keyframes load {
+            0%, 100% {
+                stroke-dashoffset: 252
+            }
+            50% {
+                stroke-dashoffset: 230
+            }
+            100% {
+                transform: rotate(360deg)
+            }
+        }
+
+        .jump {
+            animation: jump 0.5s ease-in-out infinite
+        }
+
+        .first {
+            fill: #b8d8d7;
+        }
+
+        .second {
+            fill: #73c0b0;
+            animation-delay: 0.1s;
+        }
+
+        .third {
+            fill: #4d8f8e;
+            animation-delay: 0.2s;
+        }
+
+        @keyframes jump {
+            0%, 100% {
+                transform: translateY(0)
+            }
+            50% {
+                transform: translateY(-10px)
+            }
+        }
+
+        .el-dialog {
+            width: 30%;
+        }
+
+        .el-dialog__header {
+            text-align: center;
+        }
+
+        .dialog-footer {
+            text-align: center;
+        }
+
+        .pt-120 {
+            padding-top: 50px;
+        }
+
+        .second-menu .main-menu ul li:nth-child(4) {
+            border-bottom: #0b3e6f 3px solid;
+        }
+
+    </style>
+</head>
+<body>
+<!-- header -->
+<div class="headerpage_m"></div>
+<!-- header-end -->
+<!-- main-area -->
+<main id="dcims">
+    <!-- breadcrumb-area -->
+    <section class="breadcrumb-area d-flex align-items-center" style="background-color: #82A2C2;min-height: 100px">
+        <div class="container">
+            <div class="row">
+                <div class="col-xl-6 offset-xl-3 col-lg-8 offset-lg-2">
+                    <div class="breadcrumb-wrap text-center">
+                        <div class="breadcrumb-title mb-30">
+                            <h2>定时任务管理</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- shop-area -->
+    <section class="shop-area pt-120 pb-120 p-relative wow fadeInUp animated" data-animation="fadeInUp animated"
+             data-delay=".2s">
+        <div class="container">
+            <div v-if="isLoading" class="loading">
+                <div class="main">
+                    <svg viewBox="0 0 120 120">
+                        <circle class="load one" cx="60" cy="60" r="40"></circle>
+                        <circle class="load two" cx="60" cy="60" r="40"></circle>
+                        <circle class="load three" cx="60" cy="60" r="40"></circle>
+                        <circle class="jump first" cx="45" cy="60" r="5"></circle>
+                        <circle class="jump second" cx="60" cy="60" r="5"></circle>
+                        <circle class="jump third" cx="75" cy="60" r="5"></circle>
+                    </svg>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-6 col-sm-6">
+                    <h4 align="right" class="mt-20 mb-30">任务信息</h4>
+                </div>
+            </div>
+            <div class="align-items-center" style="text-align: center;margin: 0px auto">
+                <div class="col-lg-12 col-md-12">
+                    <div style="margin: 5px;width: 100%;text-align: left">
+                        <button @click="addTask">添加任务</button>
+                    </div>
+                    <el-table
+                            border
+                            :data="tasks.slice((currentPage-1)*pagesize,currentPage*pagesize)"
+                            stripe
+                            style="width: 100%">
+                        <el-table-column
+                                show-overflow-tooltip
+                                prop="cronId"
+                                label="任务编号"
+                        >
+                        </el-table-column>
+                        <el-table-column
+                                show-overflow-tooltip
+                                prop="cronKey"
+                                label="定时任务完整类名"
+                        >
+                        </el-table-column>
+                        <el-table-column
+                                show-overflow-tooltip
+                                prop="cronExpression"
+                                label="corn表达式"
+                        >
+                        </el-table-column>
+                        <el-table-column
+                                show-overflow-tooltip
+                                prop="taskExplain"
+                                label="定时任务描述"
+                        >
+                        </el-table-column>
+                        <el-table-column
+                                show-overflow-tooltip
+                                prop="taskStatus"
+                                label="状态"
+                        >
+                            <template slot-scope="scope" style="text-align: center">
+                                <span v-show="scope.row.taskStatus==1">已启动</span>
+                                <span v-show="scope.row.taskStatus==2">已关闭</span>
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="操作">
+                            <template slot-scope="scope" style="text-align: center">
+                                <el-button
+                                        v-if="scope.row.taskStatus==1"
+                                        size="medium "
+                                        type="primary"
+                                        style="margin-top: 5px;margin-left: 10px"
+                                        @click="closeTask(scope.row)">关闭
+                                </el-button>
+                                <el-button
+                                        v-else
+                                        size="medium "
+                                        type="primary"
+                                        style="margin-top: 5px;margin-left: 10px"
+                                        @click="openTask(scope.row)">启动
+                                </el-button>
+                                <el-button
+                                        size="medium "
+                                        type="primary"
+                                        style="margin-top: 5px"
+                                        @click="updateTask(scope.row)">修改
+                                </el-button>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+
+
+                </div><!--class="col-lg-4 col-md-6"-->
+
+            </div>
+
+            <div class="row">
+                <div class="col-12">
+                    <div class="pagination-wrap mt-50 text-center">
+                        <div style="text-align: center;margin-top: 30px;">
+                            <el-pagination
+                                    :page-size="pagesize"
+                                    background
+                                    layout="prev, pager, next"
+                                    :total="total"
+                                    @current-change="current_change">
+                            </el-pagination>
+                        </div>
+                    </div>
+                </div>
+                <div></div>
+            </div>
+        </div>
+    </section>
+    <el-dialog title="修改任务" :show-close="false" :visible.sync="dialogFormVisible">
+        <el-form :model="task">
+            <el-form-item label="任务编号" :label-width="formLabelWidth">
+                <el-input v-model="task.cronId" auto-complete="off" :disabled="true"></el-input>
+            </el-form-item>
+            <el-form-item label="定时任务完整类名" :label-width="formLabelWidth">
+                <el-input v-model="task.cronKey" auto-complete="off" :disabled="true"></el-input>
+            </el-form-item>
+            <el-form-item label="cron表达式" :label-width="formLabelWidth">
+                <el-input v-model="task.cronExpression" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="任务描述" :label-width="formLabelWidth">
+                <el-input v-model="task.taskExplain" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="任务状态" :label-width="formLabelWidth">
+                <el-input v-model="task.taskStatusStr" auto-complete="off" :disabled="true"></el-input>
+            </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="updateTaskCancel">取 消</el-button>
+            <el-button type="primary" @click="updateTaskOk">确 定</el-button>
+        </div>
+    </el-dialog>
+    <el-dialog title="添加定时任务" :show-close="false" :visible.sync="addDialogFormVisible">
+        <el-form :model="taskForm">
+            <el-form-item label="定时任务完整类名" :label-width="formLabelWidth">
+                <el-input v-model="taskForm.cronKey" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="cron表达式" :label-width="formLabelWidth">
+                <el-input v-model="taskForm.cronExpression" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="任务描述" :label-width="formLabelWidth">
+                <el-input v-model="taskForm.taskExplain" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="任务状态" :label-width="formLabelWidth">
+                <select aria-label="Shop order" v-model="taskForm.taskStatus">
+                    <option value="1">开启</option>
+                    <option value="2">关闭</option>
+                </select>
+            </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="addTaskCancel">取 消</el-button>
+            <el-button type="primary" @click="addTaskOk">确 定</el-button>
+        </div>
+    </el-dialog>
+    <!-- shop-area-end -->
+</main>
+<!-- main-area-end -->
+<!-- footer -->
+
+<!-- footer-end -->
+<div class="footerpage_m"></div>
+
+<!-- JS here -->
+<!-- JS here -->
+<script src="../../js/vendor/modernizr-3.5.0.min.js"></script>
+<script src="../../js/vendor/jquery-1.12.4.min.js"></script>
+<script src="../../js/popper.min.js"></script>
+<script src="../../js/bootstrap.min.js"></script>
+<script src="../../js/one-page-nav-min.js"></script>
+<script src="../../js/jquery.meanmenu.min.js"></script>
+<script src="../../js/slick.min.js"></script>
+<script src="../../js/ajax-form.js"></script>
+<script src="../../js/paroller.js"></script>
+<script src="../../js/wow.min.js"></script>
+<script src="../../js/js_isotope.pkgd.min.js"></script>
+<script src="../../js/imagesloaded.min.js"></script>
+<script src="../../js/parallax.min.js"></script>
+<script src="../../js/jquery.waypoints.min.js"></script>
+<script src="../../js/jquery.counterup.min.js"></script>
+<script src="../../js/jquery.scrollUp.min.js"></script>
+<script src="../../js/parallax-scroll.js"></script>
+<script src="../../js/jquery.magnific-popup.min.js"></script>
+<script src="../../js/element-in-view.js"></script>
+<script src="../../js/main.js"></script>
+<script>
+    $(function () {
+        //调用公共代码
+        $('.footerpage_m').load('/commons/footer.html');
+        $('.headerpage_m').load('/commons/header.html');
+
+        $(".exit").click(function logout() {
+            $.ajax({
+                type: "post",
+                url: "/logout",
+                dataType: "json",
+                data: {},
+                success: function (res) {
+                    if (res.code == 200) {
+                        window.location.href = "http://192.168.150.130:8089/pages/login.html";
+                    } else {
+                        alert("退出失败")
+                    }
+                }
+            })
+        })
+
+        new Vue({
+            el: "#dcims",
+            data: {
+                localhost: "http://192.168.150.130:8089",
+                total: 0,
+                pagesize: 3,
+                currentPage: 1,
+                userId: "",
+                tasks: [],
+                task: {
+                    cronId: "",
+                    cronKey: "",
+                    cronExpression: "",
+                    taskExplain: "",
+                    taskStatus: "",
+                    taskStatusStr: "",
+                },
+                taskForm: {
+                    cronKey: "",
+                    cronExpression: "",
+                    taskExplain: "",
+                    taskStatus: 1,
+                },
+                users: [],
+                formLabelWidth: "120px",
+                user: {},
+                userOne: {},
+                nowDate: "",
+                isLoading: true,
+                dialogFormVisible: false,
+                addDialogFormVisible: false
+            },
+            methods: {
+                getTasks: function () {
+                    var that = this;
+                    $.ajax({
+                        url: this.localhost + "/task/taskList",
+                        type: "post",
+                        data: {},
+                        success: function (res) {
+                            that.tasks = res.tasks
+                            that.user = res.user
+                            $(".username-show").text(that.user.name)
+                            that.total = that.tasks.length
+                            that.isLoading = false
+                        }
+                    })
+                },
+                current_change: function (currentPage) {
+                    this.currentPage = currentPage;
+                },
+                logout: function () {
+                    $.ajax({
+                        type: "post",
+                        url: this.localhost + "/logout",
+                        dataType: "json",
+                        data: {},
+                        success: function (res) {
+                            if (res.code == 200) {
+                                window.location.href = "http://192.168.150.130:8089/pages/login.html";
+                            } else {
+                                alert("退出失败")
+                            }
+                        }
+                    })
+                },
+                addTask: function () {
+                    this.addDialogFormVisible = true
+                    this.taskForm = {
+                        cronKey: "",
+                        cronExpression: "",
+                        taskExplain: "",
+                        taskStatus: 1,
+                    }
+                },
+                updateTask: function (row) {
+                    this.dialogFormVisible = true
+                    this.task = {
+                        cronId: row.cronId,
+                        cronKey: row.cronKey,
+                        cronExpression: row.cronExpression,
+                        taskExplain: row.taskExplain,
+                        taskStatus: row.taskStatus,
+                        taskStatusStr: row.taskStatus==1?"已开启":"已关闭",
+                    }
+                },
+                updateTaskOk: function () {
+                    var that = this;
+                    if (this.task.cronExplain == ""
+                        || this.task.cronExpression == "") {
+                        this.$message({
+                            message: '请完善信息再提交',
+                            center: true,
+                            type: 'warning'
+                        });
+                        return;
+                    }
+                    $.ajax({
+                        url: this.localhost + "/task/updateTask",
+                        type: "post",
+                        data: this.task,
+                        success: function (res) {
+                            if (res.flag) {
+                                that.$message({
+                                    message: '任务修改成功',
+                                    center: true,
+                                    type: 'success'
+                                });
+                                that.dialogFormVisible = false;
+                                that.getTasks()
+                            } else {
+                                if(res.msg){
+                                    that.$message({
+                                        message: res.msg,
+                                        center: true,
+                                        type: 'error'
+                                    });
+                                    return
+                                }
+                                that.$message({
+                                    message: '任务修改失败',
+                                    center: true,
+                                    type: 'error'
+                                });
+                            }
+                        }
+                    })
+
+                },
+                updateTaskCancel: function () {
+                    this.dialogFormVisible = false;
+                },
+                addTaskOk: function () {
+                    var that = this;
+                    if (this.taskForm.cronKey == ""
+                        || this.taskForm.cronExpression == ""
+                        || this.taskForm.cronExplain == "") {
+                        this.$message({
+                            message: '请将信息填写完整再提交',
+                            center: true,
+                            type: 'warning'
+                        });
+                        return;
+                    }
+                    $.ajax({
+                        url: this.localhost + "/task/addTask",
+                        type: "post",
+                        data: this.taskForm,
+                        success: function (res) {
+                            that.isLoading = false
+                            if (res.flag) {
+                                that.$message({
+                                    message: '任务添加成功',
+                                    center: true,
+                                    type: 'success'
+                                });
+                                that.addDialogFormVisible = false;
+                                that.getTasks()
+                            } else {
+                                if(res.msg){
+                                    that.$message({
+                                        message: res.msg,
+                                        center: true,
+                                        type: 'error'
+                                    });
+                                    return
+                                }
+                                that.$message({
+                                    message: '任务添加失败',
+                                    center: true,
+                                    type: 'error'
+                                });
+                            }
+                        }
+                    })
+                },
+                addTaskCancel: function () {
+                    this.addDialogFormVisible = false;
+                    this.taskForm = {
+                        cronKey: "",
+                        cronExpression: "",
+                        cronExplain: "",
+                        taskStatus: ""
+                    }
+                },
+                closeTask: function (row) {
+                    var that = this
+                    $.ajax({
+                        url: this.localhost + "/task/changeStatusTaskCron",
+                        type: "post",
+                        data: {
+                            cronKey: row.cronKey,
+                            taskStatus: 2
+                        },
+                        success: function (res) {
+                            if (res.flag) {
+                                that.$message({
+                                    message: '已成功关闭定时任务',
+                                    center: true,
+                                    type: 'success'
+                                });
+                                that.getTasks()
+                            } else {
+                                that.$message({
+                                    message: '关闭定时任务失败',
+                                    center: true,
+                                    type: 'error'
+                                });
+                            }
+                        }
+                    })
+                },
+                openTask: function (row) {
+                    var that = this
+                    $.ajax({
+                        url: this.localhost + "/task/changeStatusTaskCron",
+                        type: "post",
+                        data: {
+                            cronKey: row.cronKey,
+                            taskStatus: 1
+                        },
+                        success: function (res) {
+                            if (res.flag) {
+                                that.$message({
+                                    message: '已成功开启定时任务',
+                                    center: true,
+                                    type: 'success'
+                                });
+                                that.getTasks()
+                            } else {
+                                that.$message({
+                                    message: '开启定时任务失败',
+                                    center: true,
+                                    type: 'error'
+                                });
+                            }
+                        }
+                    })
+                },
+
+            },
+            created: function () {
+                Date.prototype.format = function (format) {
+                    var o = {
+                        "M+": this.getMonth() + 1, //month
+                        "d+": this.getDate(), //day
+                        "h+": this.getHours(), //hour
+                        "m+": this.getMinutes(), //minute
+                        "s+": this.getSeconds(), //second
+                        "q+": Math.floor((this.getMonth() + 3) / 3), //quarter
+                        "S": this.getMilliseconds() //millisecond
+                    }
+                    if (/(y+)/.test(format)) {
+                        format = format.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+                    }
+                    for (var k in o) {
+                        if (new RegExp("(" + k + ")").test(format)) {
+                            format = format.replace(RegExp.$1, RegExp.$1.length == 1 ? o[k] : ("00" + o[k]).substr(("" + o[k]).length));
+                        }
+                    }
+                    return format;
+                }
+                this.nowDate = new Date().format("yyyy年MM月dd日 hh:mm:ss")
+                this.getTasks()
+                var that=this
+                $.ajax({
+                    url: this.localhost + "/user/getUser",
+                    type: "post",
+                    data: {},
+                    success: function (res) {
+                        that.user = res.user
+                        $(".username-show").text(that.user.name)
+                    }
+                })
+            }
+        })
+    })
+
+</script>
+</body>
+</html>

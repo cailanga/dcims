@@ -1,0 +1,20 @@
+.card table tr th {
+				text-align: center;
+			}
+
+			.card table tr td {
+				text-align: left;
+			}
+			.card{
+				border: 1px solid black;
+				width: 100%;
+				margin-top: 20px;
+			}
+			.card-header{
+				text-align: center;
+				font-weight: bold;
+				font-size: 20px;
+			}
+			.card-footer{
+				display: hidden;
+			}

@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="/bower_components/bootstrap/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/css/login.css"/>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <script src="/js/jquery-3.3.1.min.js"></script>
+    <script src="/js/vue.min.js"></script>
+    <script src="/js/axios.js"></script>
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+</head>
+<style>
+    .el-dialog {
+        width: 30%;
+    }
+
+    .el-dialog__header {
+        text-align: center;
+    }
+
+    .dialog-footer {
+        text-align: center;
+    }
+    .form-horizontal .heading{
+        font-weight: 600;
+        margin-bottom: 0px;
+    }
+</style>
+<body>
+<div class="container" id="dcims">
+    <div class="row">
+
+        <div class="col-md-offset-3 col-md-6">
+            <form action="#" method="post" class="form-horizontal">
+                <div style="margin-top: 10px;font-size: 30px;font-weight: 700"><span >医院感染信息监测系统</span></div>
+
+                <!--<span class="heading" style="font-size: 23px">用户登录</span>-->
+                <div class="form-group help" style="height: 10px;">
+                    <span class="logFail fa fa-user" style="color: white;display: none">账户或密码错误</span>
+                </div>
+                <div class="form-group">
+                    <div style="display: inline-block;width: 100px;color: #000;font-size: medium"><span>用户名：</span></div>
+
+                    <input type="email" name="username" class="form-control" id="inputEmail3" placeholder="用户名或电子邮件">
+                    <i class="fa fa-user"></i>
+                </div>
+                <div class="form-group help">
+                    <div style="display: inline-block;width: 100px;color: #000;font-size: medium"><span>密码：</span></div>
+
+                    <input type="password" name="password" class="form-control" id="inputPassword3" placeholder="密　码">
+                    <i class="fa fa-lock"></i>
+                    <a href="#" class="fa fa-question-circle"></a>
+                </div>
+                <div class="form-group help">
+                    <div style="display: inline-block;width: 100px;color: #000;font-size: medium"><span>验证码：</span></div>
+
+                    <input @blur="inputBlur" type="text" class="form-control code inputcode" name="checkCode" id="inputPassword4"
+                           placeholder="验  证  码">
+                    <i class="fa fa-lock"></i>
+                    <a href="#" class="fa fa-question-circle"></a>
+                </div>
+                <div class="form-group help validcode">
+                    <a class="vcimg" @click="initcode"><img alt="这是一张图片" src="#"></a>
+                    <!--&nbsp;&nbsp;<span class="nextCode" >换一张</span>-->
+                </div>
+                <div class="form-group help" style="height: 10px;">
+                    <span class="error fa fa-user" style="color: red;display: none"></span>
+                </div>
+                <div class="form-group">
+                    <div style="float:right;margin-top: 20px">
+                        <div class="main-checkbox">
+                            <input type="checkbox" id="checkbox1" name="remember-me" checked/>
+                            <label for="checkbox1"></label>
+                        </div>
+                        <span class="text">记住密码</span>
+                    </div>
+                    <div class="btn btn-default login" style="float: inherit;margin-left: 70px" @click="login">登录</div>
+                    <!--<div class="btn btn-default" @click="updatePwd">修改密码</div>-->
+                    <button type="submit" class="btn btn-default reg" style="float: inherit"><a href="/pages/register.html">注册账号</a></button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <el-dialog title="修改密码" :show-close="false" :visible.sync="dialogFormVisible">
+        <el-form :model="user">
+            <el-form-item label="用户名" :label-width="formLabelWidth">
+                <el-input placeholder="请输入用户名" v-model="user.username" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="旧密码" :label-width="formLabelWidth">
+                <el-input placeholder="请输入旧密码" v-model="user.password" auto-complete="off" show-password></el-input>
+            </el-form-item>
+            <el-form-item label="新密码" :label-width="formLabelWidth">
+                <el-input placeholder="请输入新密码" v-model="user.newPWD" auto-complete="off" show-password></el-input>
+            </el-form-item>
+            <el-form-item label="重复密码" :label-width="formLabelWidth">
+                <el-input placeholder="请重复输入密码" v-model="user.repeatPWD" auto-complete="off" show-password></el-input>
+            </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="updatePwdCancel">取 消</el-button>
+            <el-button type="primary" @click="updatePwdOk">确 定</el-button>
+        </div>
+    </el-dialog>
+</div>
+</body>
+<!--<script type="text/javascript" src="/js/jquery-3.3.1.min.js"></script>-->
+<script type="text/javascript">
+    $(function () {
+        new Vue({
+            el:"#dcims",
+            data:{
+                localhost:"http://192.168.150.130:8089",
+                user:{password:"",newPWD:"",repeatPWD:"",username:""},
+                formLabelWidth:"120px",
+                dialogFormVisible:false,
+                codeStatus:""
+            },
+            methods:{
+                updatePwd:function(){
+                    this.dialogFormVisible=true
+                },
+                updatePwdOk:function () {
+                    var that=this;
+                    if(this.user.newPWD==""||this.user.repeatPWD==""||this.user.password==""){
+                        this.$message({
+                            message: '输入不能为空',
+                            center: true,
+                            type: 'warning'
+                        });
+                        return;
+                    }
+                    if(this.user.newPWD!=this.user.repeatPWD){
+                        this.user.repeatPWD=""
+                        this.$message({
+                            message: '两次密码不一致，请重新输入',
+                            center: true,
+                            type: 'warning'
+                        });
+                        return;
+                    }
+                    $.ajax({
+                        url: this.localhost+"/user/updateUserPwd",
+                        type:"post",
+                        data:this.user,
+                        success:function (res) {
+                            that.isLoading=false
+                            var flag=res.flag
+                            if(flag=="success"){
+                                that.$message({
+                                    message: '密码修改成功',
+                                    center: true,
+                                    type: 'success'
+                                });
+                                that.user.repeatPWD=""
+                                that.user.newPWD=""
+                                that.user.password=""
+                                that.user.username=""
+                            }else if(flag=="error"){
+                                that.$message({
+                                    message: '密码修改失败',
+                                    center: true,
+                                    type: 'error'
+                                });
+                                that.user.repeatPWD=""
+                                that.user.newPWD=""
+                                that.user.password=""
+                            }else if(flag=="UserIsNotExist"){
+                                that.$message({
+                                    message: '用户名不存在',
+                                    center: true,
+                                    type: 'error'
+                                });
+                                that.user.repeatPWD=""
+                                that.user.newPWD=""
+                                that.user.password=""
+                                that.user.username=""
+                            }else if(flag=="pwdIsNotCorrect"){
+                                that.$message({
+                                    message: '旧密码错误',
+                                    center: true,
+                                    type: 'error'
+                                });
+                                that.user.repeatPWD=""
+                                that.user.newPWD=""
+                                that.user.password=""
+                            }
+                        }
+                    })
+                    this.dialogFormVisible=false;
+                },
+                updatePwdCancel:function () {
+                    this.dialogFormVisible=false;
+                    this.user.username=""
+                    this.user.password=""
+                    this.user.repeatPWD=""
+                    this.user.newPWD=""
+                },
+                login:function () {
+                    if( $("#inputEmail3").val()==""||$("#inputPassword3").val()==""||$("#inputPassword4").val()==""){
+                        this.$message.error('请输入完整信息再登录');
+                        return false
+                    }
+                    console.log("rememberMe:"+$("#checkbox1").val())
+                    var that=this
+                    if (this.codeStatus == "success") {
+                        $.ajax({
+                            url: "http://192.168.150.130:8089/login",
+                            type: "post",
+                            // dataType:"json",
+                            async: true,
+                            data: {
+                                username: $("#inputEmail3").val(),
+                                password: $("#inputPassword3").val(),
+                                rememberMe: $("#checkbox1").val()
+                            },
+                            success: function (data) {
+                                if (data.code == 200) {
+                                    window.location.href = "http://192.168.150.130:8089/pages/index.html";
+                                } else {
+                                    window.location.href = "http://192.168.150.130:8089/pages/failer.html";
+                                }
+                            },
+                            error: function (error) {
+                                that.codeStatus=""
+                                that.$message.error('登陆失败，用户或密码失败');
+                                // $(".logFail").css("display", "block")
+                                // $("#inputEmail3").val("")
+                                $("#inputPassword3").val("")
+                                $(".inputcode").val("")
+                                return
+                            }
+                        })
+                        return false;
+                    }
+                    if (this.codeStatus == "error") {
+                        $(".error").css("display", "block");
+                        $(".error").html("验证码错误");
+                        return false;
+                    } else {
+                        // console.log("this.codeStatus:" + this.codeStatus)
+                        // $(".error").css("display", "block");
+                        // $(".error").html("请将信息填写完整");
+                        this.$message.error('请输入正确信息再登录');
+                        return false;
+                    }
+                },
+                initcode:function() {
+                    var xhr = new XMLHttpRequest();
+                    xhr.open("get", "http://192.168.150.130:8089/user/vc", true);
+                    xhr.responseType = "blob";
+                    xhr.onload = function () {
+                        if (this.status == 200) {
+                            var blob = this.response;
+                            $(".vcimg>img").attr("src", window.URL.createObjectURL(blob));
+                        }
+                    }
+                    xhr.send();
+                },
+                getURLParameter:function(paramName) {
+                    var urlParams = window.location.href.split("?")[1];
+                    if (urlParams == null) {
+                        return null;
+                    }
+                    var paramArray = urlParams.split("&");
+                    var len = paramArray.length;
+                    var paramObj = {};//json对象
+                    var arr = [];//数组对象
+                    for (var i = 0; i < len; i++) {
+                        arr = paramArray[i].split("=");
+                        paramObj[arr[0]] = arr[1];
+                    }
+                    for (var key in paramObj) {
+                        if (key == paramName) {
+                            return paramObj[paramName];
+                        }
+                    }
+                    return null;
+                },
+                inputBlur:function () {
+                    var that=this;
+                    $.post("http://192.168.150.130:8089/user/loginCheckCode", {"checkCode": $(".inputcode").val()}, function (data) {
+                        console.log("data:" + data)
+                        that.codeStatus = data;
+                        if (data == "success") {
+                            $(".logFail").css("display", "none")
+                            $(".error").html("");
+                            $(".error").css("display", "none");
+                        } else if (data == "null") {
+
+                            $(".error").html("验证码不能为空");
+                            $(".error").css("display", "block");
+                        } else if (data == "error") {
+
+                            $(".error").html("验证码错误");
+                            $(".error").css("display", "block");
+                        }
+                    })
+                }
+            },
+            created:function () {
+                var flg = this.getURLParameter("fail");
+                console.log(flg)
+                if (flg != null) {
+                    // $(".logFail").css("display", "block")
+                    this.$message.error('登陆失败，用户或密码错误');
+                }
+
+                this.initcode();
+                $(".reg").click(function () {
+                    $(".inputcode").unbind("blur");
+                })
+            }
+        })
+    })
+</script>
+</html>

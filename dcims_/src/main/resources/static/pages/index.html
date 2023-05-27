@@ -1,0 +1,391 @@
+<!doctype html>
+<html class="no-js" lang="zxx">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>医院感染信息监测系统 </title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Place favicon.ico in the root Internist, General Practitonery -->
+
+    <!-- CSS here -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/animate.min.css">
+    <link rel="stylesheet" href="/css/magnific-popup.css">
+    <link rel="stylesheet" href="/fontawesome/css/all.min.css">
+    <link rel="stylesheet" href="/css/dripicons.css">
+    <link rel="stylesheet" href="/css/slick.css">
+    <link rel="stylesheet" href="/css/default.css">
+    <link rel="stylesheet" href="/css/meanmenu.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+    <link rel="stylesheet" href="/css/ionicons.min.css">
+    <link rel="stylesheet" href="/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/css/AdminLTE.min.css">
+    <link rel="stylesheet" href="/css/_all-skins.min.css">
+
+
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <script src="/js/jquery-3.3.1.min.js"></script>
+    <script src="/js/vue.min.js"></script>
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+
+
+    <style type="text/css">
+        .mainMsg {
+            display: flex;
+        }
+
+
+        /*动画加载*/
+        .loading {
+            position: fixed;
+            left: 0;
+            top: 0;
+            /*background: url('/img/three-dots.svg') center center no-repeat #fff;*/
+            background-color: white;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1000;
+            /*opacity: 0.8;*/
+        }
+
+       .main {
+            height: 100px;
+            width: 100px;
+            margin: 200px auto
+        }
+
+        .main div {
+            color: #799761;
+            margin: 50px auto;
+        }
+
+        svg {
+            fill: none
+        }
+
+        .load {
+            stroke-width: 15px;
+            stroke-dasharray: 252;
+            stroke-dashoffset: 0;
+            animation: load 1.5s ease-in-out infinite;
+            transform-origin: center center
+
+        }
+
+        .one {
+            stroke: #b8d8d7;
+        }
+
+        .two {
+            stroke: #73c0b0;
+            animation-delay: 0.1s;
+        }
+
+        .three {
+            stroke: #4d8f8e;
+            animation-delay: 0.2s
+        }
+
+        @keyframes load {
+            0%, 100% {
+                stroke-dashoffset: 252
+            }
+            50% {
+                stroke-dashoffset: 230
+            }
+            100% {
+                transform: rotate(360deg)
+            }
+        }
+
+        .jump {
+            animation: jump 0.5s ease-in-out infinite
+        }
+
+        .first {
+            fill: #b8d8d7;
+        }
+
+        .second {
+            fill: #73c0b0;
+            animation-delay: 0.1s;
+        }
+
+        .third {
+            fill: #4d8f8e;
+            animation-delay: 0.2s;
+        }
+
+        @keyframes jump {
+            0%, 100% {
+                transform: translateY(0)
+            }
+            50% {
+                transform: translateY(-10px)
+            }
+        }
+        .second-menu .main-menu ul li:nth-child(1){
+            border-bottom: #0b3e6f 3px solid;
+        }
+    </style>
+</head>
+<body>
+<!-- header -->
+<div class="headerpage_m"></div>
+<!-- header-end -->
+
+<!-- main-area -->
+<main id="dcims">
+    <!-- slider-area -->
+    <section id="home" class="slider-area fix p-relative">
+        <div v-if="isLoading" class="loading">
+            <div class="main">
+                <svg viewBox="0 0 120 120">
+                    <circle class="load one" cx="60" cy="60" r="40"></circle>
+                    <circle class="load two" cx="60" cy="60" r="40"></circle>
+                    <circle class="load three" cx="60" cy="60" r="40"></circle>
+                    <circle class="jump first" cx="45" cy="60" r="5"></circle>
+                    <circle class="jump second" cx="60" cy="60" r="5"></circle>
+                    <circle class="jump third" cx="75" cy="60" r="5"></circle>
+                </svg>
+            </div>
+        </div>
+        <div class="slider-active2">
+            <!-- <div class="single-slider slider-bg d-flex align-items-center" style="background-image:url(img/testimonial/test-bg.jpg)"> -->
+            <div class="single-slider slider-bg d-flex align-items-center"
+                 style="background-image:url(/img/an-bg/header-bg.png)">
+                <div class="container">
+                    <div class="row align-items-center">
+                        <div class="col-lg-12" >
+                            <div class="slider-content s-slider-content text-center">
+                                <h2 data-animation="fadeInUp" data-delay=".4s">欢迎进入<br/><span>医院感染信息监测系统</span></h2>
+                                <div style="margin: 0px auto;width: 37%;text-align: center;margin-top: 130px">
+                                    <table class="resultInfo">
+                                        <tr>
+                                            <th colspan="4"><h3>实时疫情信息</h3></th>
+                                        </tr>
+                                        <tr>
+                                            <th>现存确诊人数：</th>
+                                            <td style="width: 120px;">{{currentConfirmedCount}}人</td>
+                                            <th>累计确诊：</th>
+                                            <td>{{confirmedCount}}人</td>
+                                        </tr>
+                                        <tr>
+                                            <th>境外输入:</th>
+                                            <td>{{suspectedCount}}人</td>
+                                            <th>累计治愈:</th>
+                                            <td>{{curedCount}}人</td>
+                                        </tr>
+                                        <tr>
+                                            <th>累计死亡:</th>
+                                            <td>{{deadCount}}人</td>
+                                            <th>新增确诊人数:</th>
+                                            <td>{{currentConfirmedIncr}}人</td>
+                                        </tr>
+                                        <tr>
+                                            <th>新增治愈:</th>
+                                            <td>{{curedIncr}}人</td>
+                                            <th>新增死亡人数：</th>
+                                            <td>{{deadIncr}}人</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                       <!-- <div class="col-lg-6">
+                            <img src="/img/bg/header-img.png" alt="header-img" class="header-img"/>
+                        </div>-->
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+    </section>
+    <!-- slider-area-end -->
+    <!-- services-area -->
+    <section id="services" class="services-area services-bg services-two pt-100"
+             style="background-image:url(/img/an-bg/an-bg02.png); background-size: contain; background-repeat: no-repeat;background-position: center center;">
+        <div class="container mainMsg">
+            <div class="col-lg-3 col-xs-6">
+                <div class="small-box bg-blue" >
+                    <!--<div class="icon">
+                        <i class="fa fa-list"></i>
+                    </div>-->
+                    <a href="/pages/user/ICU.html" class="small-box-footer">
+                        <div class="inner" style="height: 100px;text-align: center;">
+                            <!--                        <p>HOSTPITAL CARD</p>-->
+                            <h4 style="padding-top: 15%">ICU监测</h4>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-3 col-xs-6">
+                <div class="small-box bg-blue">
+                    <a href="/pages/user/data-search-yisibaofa.html" class="small-box-footer">
+                        <div class="inner" style="height: 100px;text-align: center">
+                            <h4 style="padding-top: 15%">疑似爆发</h4>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-3 col-xs-6">
+                <div class="small-box bg-blue">
+                    <a href="/pages/user/zhinengshaicha.html" class="small-box-footer">
+                        <div class="inner" style="height: 100px;text-align: center">
+                            <h4 style="padding-top: 15%">智能筛查</h4>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-3 col-xs-6">
+                <div class="small-box bg-blue">
+                    <a href="/pages/user/data-search-mubiaojiance.html" class="small-box-footer">
+                        <div class="inner" style="height: 100px;text-align: center">
+                            <h4 style="padding-top: 15%">多重耐药</h4>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- services-area-end -->
+
+
+</main>
+<!-- main-area-end -->
+<!-- footer -->
+<div class="footerpage_m"></div>
+<!-- footer-end -->
+
+
+<!-- JS here -->
+<!-- JS here -->
+
+<script src="/js/vendor/modernizr-3.5.0.min.js"></script>
+<script src="/js/vendor/jquery-1.12.4.min.js"></script>
+<script src="/js/popper.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/one-page-nav-min.js"></script>
+<script src="/js/jquery.meanmenu.min.js"></script>
+<script src="/js/slick.min.js"></script>
+<script src="/js/ajax-form.js"></script>
+<script src="/js/paroller.js"></script>
+<script src="/js/wow.min.js"></script>
+<script src="/js/js_isotope.pkgd.min.js"></script>
+<script src="/js/imagesloaded.min.js"></script>
+<script src="/js/parallax.min.js"></script>
+<script src="/js/jquery.waypoints.min.js"></script>
+<script src="/js/jquery.counterup.min.js"></script>
+<script src="/js/jquery.scrollUp.min.js"></script>
+<script src="/js/parallax-scroll.js"></script>
+<script src="/js/jquery.magnific-popup.min.js"></script>
+<script src="/js/element-in-view.js"></script>
+<script src="/js/main.js"></script>
+<script>
+    $(function () {
+        //调用公共代码
+        $('.footerpage_m').load('/commons/footer.html');
+        $('.headerpage_m').load('/commons/header.html');
+
+
+        let MyMain = new Vue({
+            el: "#dcims",
+            data: {
+                localhost: "http://192.168.150.130:8089",
+                user: "",
+                nowDate: "",
+                currentConfirmedCount: "",
+                confirmedCount: "",
+                suspectedCount: "",
+                curedCount: "",
+                deadCount: "",
+                currentConfirmedIncr: "",
+                curedIncr: "",
+                deadIncr: "",
+                isLoading: true
+            },
+            methods: {
+                getInfo: function () {
+                    var that = this;
+                    $.ajax({
+                        type: "post",
+                        url: this.localhost + "/user/getUser",
+                        data: {},
+                        success: function (res) {
+                            that.user = res.user
+                            $(".username-show").text(that.user.name)
+                        }
+                    })
+                },
+                logout: function () {
+                    $.ajax({
+                        type: "post",
+                        url: this.localhost + "/logout",
+                        dataType: "json",
+                        data: {},
+                        success: function (res) {
+                            if (res.code == 200) {
+                                window.location.href = "http://192.168.150.130:8089/pages/login.html";
+                            } else {
+                                alert("退出失败")
+                            }
+                        }
+                    })
+                }
+            },
+            created: function () {
+                var that = this;
+                /*$.get("http://api.tianapi.com/txapi/ncov/index?key=f995a2ef046d780c6224109a910ae2aa",
+                    function (data, status) {
+                    if(data==null || data.newslist.length==0) {
+                        return
+                    }
+                    if(status!=200){
+                        return;
+                    }
+                        that.currentConfirmedCount = data.newslist[0].desc.currentConfirmedCount;
+                        that.confirmedCount = data.newslist[0].desc.confirmedCount
+                        that.suspectedCount = data.newslist[0].desc.suspectedCount
+                        that.curedCount = data.newslist[0].desc.curedCount
+                        that.deadCount = data.newslist[0].desc.deadCount
+                        that.currentConfirmedIncr = data.newslist[0].desc.currentConfirmedIncr
+                        that.curedIncr = data.newslist[0].desc.curedIncr
+                        that.deadIncr = data.newslist[0].desc.deadIncr
+
+                    });*/
+                that.isLoading = false
+                Date.prototype.format = function (format) {
+                    var o = {
+                        "M+": this.getMonth() + 1, //month
+                        "d+": this.getDate(), //day
+                        "h+": this.getHours(), //hour
+                        "m+": this.getMinutes(), //minute
+                        "s+": this.getSeconds(), //second
+                        "q+": Math.floor((this.getMonth() + 3) / 3), //quarter
+                        "S": this.getMilliseconds() //millisecond
+                    }
+                    if (/(y+)/.test(format)) {
+                        format = format.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+                    }
+                    for (var k in o) {
+                        if (new RegExp("(" + k + ")").test(format)) {
+                            format = format.replace(RegExp.$1, RegExp.$1.length == 1 ? o[k] : ("00" + o[k]).substr(("" + o[k]).length));
+                        }
+                    }
+                    return format;
+                }
+                this.nowDate = new Date().format("yyyy年MM月dd日 hh:mm:ss")
+                this.getInfo()
+            }
+        })
+    })
+
+
+</script>
+</body>
+</html>

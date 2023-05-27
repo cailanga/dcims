@@ -1,0 +1,1659 @@
+<!doctype html>
+<html class="no-js" lang="zxx">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>信息统计</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+<!--    <link rel="icon" href="https://static.jianshukeji.com/highcharts/images/favicon.ico">-->
+    <!-- Place favicon.ico in the root Internist, General Practitonery -->
+
+    <!-- CSS here -->
+
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <script src="/js/jquery-3.3.1.min.js"></script>
+    <script src="/js/vue.min.js"></script>
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+
+
+    <script src="https://code.hcharts.cn/highcharts/highcharts.js"></script>
+    <script src="https://code.hcharts.cn/highcharts/highcharts-more.js"></script>
+    <script src="https://code.hcharts.cn/highcharts/highcharts-3d.js"></script>
+    <script src="https://code.hcharts.cn/highcharts/modules/exporting.js"></script>
+    <script src="https://code.hcharts.cn/highcharts/modules/series-label.js"></script>
+    <script src="https://code.hcharts.cn/highcharts/modules/oldie.js"></script>
+    <script src="https://code.hcharts.cn/highcharts-plugins/highcharts-zh_CN.js"></script>
+    <script src="https://code.hcharts.cn/highcharts/themes/dark-unica.js"></script>
+    <!--    <script src="http://cdn.highcharts.com.cn/highmaps/10.0.0/highmaps.js"></script>-->
+    <!--    <script src="https://data.jianshukeji.com/geochina/china.js"></script>-->
+    <!--    <script src="https://cdn.highcharts.com.cn/highcharts/themes/grid-light.js"></script>-->
+
+    <style type="text/css">
+        body {
+            background: url("/img/chartBg1.jpeg") no-repeat center 0px;
+            background-position: center;
+            background-size: cover;
+            height: 100%;
+            background-attachment: fixed;
+            /*background-color: #3A3A4F!important;*/
+        }
+
+        a {
+            color: white;
+            text-decoration: none;
+        }
+
+        tr {
+            width: 100%;
+
+        }
+
+        @font-face {
+            font-family: 'UnidreamLED';
+            src: url(/css/font/UnidreamLED.eot); /***兼容ie9***/
+            src: url(/css/font/UnidreamLED.eot?#iefix) format('embedded-opentype'), /***兼容ie6-ie8***/ url('/css/font/UnidreamLED.woff') format('woff'),
+            local('/css/font/UnidreamLED'), url("/css/font/UnidreamLED.woff");/***默认使用本地的***/
+        }
+
+        .LEDFont {
+            font-family: UnidreamLED;
+            font-size: 35px;
+        }
+
+        /*tr, td {
+            color: white;
+            text-align: center;
+            border: 1px solid black;
+        }*/
+
+        .item {
+            margin-top: 10px;
+            margin-right: 40px;
+        }
+    </style>
+</head>
+<body style="">
+<!-- header -->
+<div class="headerpage_m"></div>
+<!-- header-end -->
+
+<!-- main-area -->
+<main id="dcims">
+    <div style="position: absolute;color:white;left: 70%;">
+        <a href="/pages/index.html">
+            <h4 align="center" style="display: inline-block">返回首页</h4>
+        </a>
+        <div style="display: inline-block;margin-left: 20px">
+            <el-badge :value="no_read_count" class="item" :hidden="hidden">
+                <el-button size="small" @click="look">预警消息</el-button>
+            </el-badge>
+        </div>
+    </div>
+    <div style="position: absolute;color:white;left: 34%;">
+        <h2 align="center">医院信息统计</h2>
+        <div style="position:relative;background-color:rgba(1,96,147,0.5);margin-top: 4px;width: 470px;padding: 15px">
+            <div style="width: 100%;margin: 0px auto;text-align: center">
+                <div style="display: inline-block;line-height:100%;margin-right: 70px;">
+                    <div>
+                        <span class="LEDFont" name="patientCount" style=""></span>
+                    </div>
+                    <div style="margin-top: 2px">
+                        <span style="font-size: 10px">病人数量</span>
+                    </div>
+                </div>
+                <div style="display: inline-block;line-height:100%;margin-right: 70px">
+                    <div>
+                        <span class="LEDFont" name="doctorCount" style=""></span>
+                    </div>
+                    <div style="margin-top: 2px"><span style="font-size: 10px">医生数量</span></div>
+                </div>
+                <div style="display: inline-block;line-height:100%;margin-right: 20px">
+                    <div>
+                        <span class="LEDFont" name="departmentCount" style=""></span>
+                    </div>
+                    <div style="margin-top: 2px">
+                        <span style="font-size: 10px">科室数量</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <!--<div id="container" style="max-width:800px;height:400px"></div>
+    <div id="container1" style="min-width:400px;height:400px"></div>-->
+    <div style="position:absolute;top:12%;left:30px;display: inline-block;margin-bottom: 50px">
+        <div id="container" style="width:450px;height:300px;"></div>
+        <div id="wrapper" style="opacity: 0.7;margin: 0px auto;text-align: center">
+            <button id="plain" style="background-color: grey;color: white">普通</button>
+            <button id="inverted" style="background-color: grey;color: white">反转</button>
+            <button id="polar" style="background-color: grey;color: white">极地图</button>
+            <input type="number" name="year" value="2021" placeholder="输入年份"
+                   style="width: 70px;margin-right: 10px;margin-left: 30px">
+            <button id="getPatientsByAgeRange" onclick="getPatientsByAgeRange()">查询</button>
+        </div>
+    </div>
+
+    <div style="position:absolute;top:12%;right:20px;display: inline-block;">
+        <div id="container1" style="width:450px;height:300px;padding-top: 10px"></div>
+        <div style="margin: 0px auto;text-align: center;opacity: 0.7">
+            <input type="number" name="year1" value="2021" placeholder="输入年份"
+                   style="width: 70px;margin-right: 10px;margin-left: 30px">
+            <input type="number" name="month1" value="3" placeholder="输入月份"
+                   style="width: 70px;margin-right: 20px;margin-left: 30px">
+            <button id="getDepartmentToPatients" onclick="getDepartmentToPatients()">查询</button>
+        </div>
+    </div>
+    <!--
+        疫情信息链接失效
+    <div style="position:absolute;top:20%;left:34%;display: inline-block;">
+        <div>
+            <div id="container2" style="width:500px;height:250px;"></div>
+            <div style="position: relative;bottom: 0px">
+                <input width="50px" type="date" id="myDate" placeholder="请选择日期">
+                <button id="searchByDate">查看</button>
+            </div>
+
+        </div>
+
+
+    </div>-->
+    <div style="position:absolute;bottom:3%;left:14%;right:10%;display: inline-block;">
+        <!--        <input type="date" id="myDate" placeholder="请选择日期"><button id="searchByDate">查看</button>-->
+        <div id="container3" style="width:1100px;height:250px;"></div>
+        <div style="margin: 0px auto;text-align: center;opacity: 0.7">
+            <input type="number" name="search_patientCheck_year" value="2021" placeholder="输入年份"
+                   style="width: 70px;margin-right: 10px;margin-left: 30px">
+            <input type="number" name="search_patientCheck_month" value="3" placeholder="输入月份"
+                   style="width: 70px;margin-right: 20px;margin-left: 30px">
+            <button id="getPatientCheckInfo" onclick="getPatientCheckInfo()">查询</button>
+        </div>
+    </div>
+    <!--    <div style="position:absolute;bottom:50px;right:30px;display: inline-block;">-->
+    <!--        <div id="container3" style="width:600px;height:400px;"></div>-->
+    <!--    </div>-->
+    <div id="layer-PatientInfo"
+         style="width:450px;min-height:200px;position:absolute;top:16%;left:30%;display: none;background-color: rgba(4,99,158,0.7);border-radius: 10px">
+        <div id="patient_title" style="width:100%;text-align: center;padding-top: 10px;color: white">
+            病人信息
+        </div>
+        <table style="width:80%;margin: 0px auto;margin-top: 20px">
+            <thead>
+            <tr>
+                <th>序号</th>
+                <th>姓名</th>
+                <th>手机号</th>
+                <th>年龄</th>
+            </tr>
+            </thead>
+            <tbody class="tbody" id="patientResult" style="color:white">
+
+            </tbody>
+        </table>
+        <div style="width: 50px;margin: 0px auto;margin-top: 30px">
+            <button id="patientInfoClose">关闭</button>
+        </div>
+    </div>
+    <el-drawer
+            title="预警信息"
+            :visible.sync="warnRecordTable"
+            direction="rtl"
+            size="50%">
+        <el-tabs v-model="activeName" type="card" @tab-click="handleClick">
+            <el-tab-pane label="未读信息" name="first">
+                <el-table
+                        :data="warnRecords"
+                        style="width: 100%;color:black">
+                    <el-table-column type="expand">
+                        <template slot-scope="props">
+                            <el-form label-position="left" inline class="demo-table-expand">
+                                <el-form-item label="预警阀值（人）:">
+                                    <span>{{ props.row.warnCount }}人</span>
+                                </el-form-item>
+                                <el-form-item label="当前预警（人）：">
+                                    <span>{{ props.row.count }}人</span>
+                                </el-form-item>
+                                <el-form-item label="预警内容：">
+                                    <p>{{props.row.warnContent}}</p>
+                                </el-form-item>
+                            </el-form>
+                        </template>
+                    </el-table-column>
+                    <el-table-column
+                            label="预警编号"
+                            prop="id">
+                    </el-table-column>
+                    <el-table-column
+                            label="预警名称"
+                            show-overflow-tooltip
+                            prop="warnName">
+                    </el-table-column>
+                    <el-table-column
+                            label="预警时间"
+                            show-overflow-tooltip
+                            prop="warnTime">
+                    </el-table-column>
+                    <el-table-column
+                            label="状态">
+                        <template slot-scope="props">
+                            <el-button v-if="props.row.status==0" type="primary" @click="read(props.row.id)">标记已读
+                            </el-button>
+                            <span v-else>已读</span>
+                        </template>
+                    </el-table-column>
+                </el-table>
+                <div style="text-align: center;margin-top: 30px;">
+                    <el-pagination
+                            :page-size="pageSize"
+                            background
+                            layout="prev, pager, next"
+                            :total="total"
+                            @current-change="current_change">
+                    </el-pagination>
+                </div>
+            </el-tab-pane>
+            <el-tab-pane label="已读信息" name="second">
+                <el-table
+                        :data="warnRecords1"
+                        style="width: 100%">
+                    <el-table-column type="expand">
+                        <template slot-scope="props">
+                            <el-form label-position="left" inline class="demo-table-expand">
+                                <el-form-item label="预警阀值（人数）">
+                                    <span>{{ props.row.warnCount }}</span>
+                                </el-form-item>
+                                <el-form-item label="当前预警人数">
+                                    <span>{{ props.row.count }}</span>
+                                </el-form-item>
+                                <el-form-item label="预警内容：">
+                                    <p>{{props.row.warnContent}}</p>
+                                </el-form-item>
+                            </el-form>
+
+                        </template>
+                    </el-table-column>
+                    <el-table-column
+                            label="预警编号"
+                            prop="id">
+                    </el-table-column>
+                    <el-table-column
+                            label="预警名称"
+                            prop="warnName">
+                    </el-table-column>
+                    <el-table-column
+                            label="预警时间"
+                            prop="warnTime">
+                    </el-table-column>
+                    <el-table-column
+                            label="状态">
+                        <template slot-scope="props">
+                            <el-button v-if="props.row.status==0" type="primary" @click="read(props.row.id)">标记已读
+                            </el-button>
+                            <span v-else>已读</span>
+                        </template>
+                    </el-table-column>
+                </el-table>
+                <div style="text-align: center;margin-top: 30px;">
+                    <el-pagination
+                            :page-size="pageSize"
+                            background
+                            layout="prev, pager, next"
+                            :total="total1"
+                            @current-change="current_change1">
+                    </el-pagination>
+                </div>
+            </el-tab-pane>
+
+        </el-tabs>
+
+    </el-drawer>
+</main>
+<!--<script src="/pages/China.json"></script>-->
+<script>
+
+
+    //折线图
+    // import it from "../../bower_components/moment/src/locale/it";
+
+    // import tr from "../../bower_components/moment/src/locale/tr";
+
+    function createChart6(yiqingData) {
+        console.log(yiqingData)
+        var chart = Highcharts.chart('container2', {
+            chart: {
+                type: 'line',
+                backgroundColor: 'rgba(1,43,67,0.4)',
+            },
+            credits: {
+                enabled: false//不显示highCharts版权信息
+            },
+            title: {
+                text: '疫情数据折线图'
+            },
+            subtitle: {
+                text: '数据来源: http://api.tianapi.com/txapi'
+            },
+            xAxis: {
+                categories: ['现存确诊人数', '累计确诊', '累计治愈', '累计死亡']
+            },
+            yAxis: {
+                title: {
+                    text: '人数'
+                }
+            },
+            plotOptions: {
+                line: {
+                    dataLabels: {
+                        // 开启数据标签
+                        enabled: true
+                    },
+                    // 关闭鼠标跟踪，对应的提示框、点击事件会失效
+                    // enableMouseTracking: false
+                }
+            },
+            series: yiqingData
+        });
+
+    }
+
+    function createHunheChart(yiqinData) {
+        console.log(yiqinData)
+
+        var chart = Highcharts.chart('container2', {
+            chart: {
+                zoomType: 'xy'
+            },
+            title: {
+                text: '疫情数据对比'
+            },
+            subtitle: {
+                text: '数据来源: WorldClimate.com'
+            },
+            xAxis: [{
+                categories: [
+                    '现存确诊人数', '累计确诊', '累计治愈', '累计死亡'
+                ],
+                crosshair: true
+            }],
+            yAxis: [{ // Primary yAxis
+                labels: {
+                    format: '{value} 人',
+                    style: {
+                        color: Highcharts.getOptions().colors[2]
+                    }
+                },
+                title: {
+                    text: '国内',
+                    style: {
+                        color: Highcharts.getOptions().colors[2]
+                    }
+                },
+                opposite: true
+            }, { // Secondary yAxis
+                gridLineWidth: 0,
+                title: {
+                    text: '国外',
+                    style: {
+                        color: Highcharts.getOptions().colors[0]
+                    }
+                },
+                labels: {
+                    format: '{value} 人',
+                    style: {
+                        color: Highcharts.getOptions().colors[0]
+                    }
+                }
+            }, { // Tertiary yAxis
+                gridLineWidth: 0,
+                title: {
+                    text: '全球',
+                    style: {
+                        color: Highcharts.getOptions().colors[1]
+                    }
+                },
+                labels: {
+                    format: '{value} 人',
+                    style: {
+                        color: Highcharts.getOptions().colors[1]
+                    }
+                },
+                opposite: true
+            }],
+            tooltip: {
+                shared: true
+            },
+            legend: {
+                layout: 'vertical',
+                align: 'left',
+                x: 80,
+                verticalAlign: 'top',
+                y: 55,
+                floating: true,
+                backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'
+            },
+            series: yiqinData
+        });
+    }
+
+    //折线图数据获取
+    function createChart5(date) {
+        var dateStr = "";
+        console.log(date)
+        if (date != "") {
+            dateStr = "&date=" + date
+        }
+        var yiqinData = []
+
+        $.get("http://api.tianapi.com/txapi/ncov/index?key=f995a2ef046d780c6224109a910ae2aa" + dateStr,
+            function (data, status) {
+                var item = data.newslist[0].desc
+                var item1 = {
+                    name: '国内',
+                    // type: 'spline',
+                    // yAxis: 1,
+                    data: [
+                        item.currentConfirmedCount,
+                        item.confirmedCount,
+                        item.curedCount,
+                        item.deadCount],
+                    /*tooltip: {
+                        valueSuffix: ' 人'
+                    }*/
+                }
+                var item2 = {
+                    name: '国外',
+                    // type: 'spline',
+                    // yAxis: 2,
+                    data: [item.foreignStatistics.currentConfirmedCount,
+                        item.foreignStatistics.confirmedCount,
+                        item.foreignStatistics.curedCount,
+                        item.foreignStatistics.deadCount],
+                    /* tooltip: {
+                         valueSuffix: ' 人'
+                     }*/
+                }
+                var item3 = {
+                    name: '全球',
+                    // type: 'column',
+
+                    data: [
+                        item.globalStatistics.currentConfirmedCount,
+                        item.globalStatistics.confirmedCount,
+                        item.globalStatistics.curedCount,
+                        item.globalStatistics.deadCount
+                    ],
+                    /*tooltip: {
+                        valueSuffix: ' 人'
+                    }*/
+                }
+                yiqinData.push(item1)
+                yiqinData.push(item2)
+                yiqinData.push(item3)
+                // createHunheChart(yiqinData)
+                createChart6(yiqinData)
+            });
+
+    }
+
+    /*var chart1 = Highcharts.chart('container1',{
+        chart: {
+            type: 'column'
+        },
+        title: {
+            text: '月平均降雨量'
+        },
+        subtitle: {
+            text: '数据来源: WorldClimate.com'
+        },
+        xAxis: {
+            categories: [
+                '一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'
+            ],
+            crosshair: true
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: '降雨量 (mm)'
+            }
+        },
+        tooltip: {
+            // head + 每个 point + footer 拼接成完整的 table
+            headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+            pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                '<td style="padding:0"><b>{point.y:.1f} mm</b></td></tr>',
+            footerFormat: '</table>',
+            shared: true,
+            useHTML: true
+        },
+        plotOptions: {
+            column: {
+                borderWidth: 0
+            }
+        },
+        series: [{
+            name: '东京',
+            data: [49.9, 71.5, 106.4, 129.2, 144.0, 176.0, 135.6, 148.5, 216.4, 194.1, 95.6, 54.4]
+        }, {
+            name: '纽约',
+            data: [83.6, 78.8, 98.5, 93.4, 106.0, 84.5, 105.0, 104.3, 91.2, 83.5, 106.6, 92.3]
+        }, {
+            name: '伦敦',
+            data: [48.9, 38.8, 39.3, 41.4, 47.0, 48.3, 59.0, 59.6, 52.4, 65.2, 59.3, 51.2]
+        }, {
+            name: '柏林',
+            data: [42.4, 33.2, 34.5, 39.7, 52.6, 75.5, 57.4, 60.4, 47.6, 39.1, 46.8, 51.1]
+        }]
+    });*/
+
+    var year = 2021;
+    var year1 = 2021;
+    var month1 = 3;
+    var search_patientCheck_year = 2021
+    var search_patientCheck_month = 3
+    var X;
+    var Y;
+
+    $.ajax({
+        type: "post",
+        url: "/user/tongjiCount",
+        data: {},
+        success: function (res) {
+            var patientCount = res.patientCount;
+            var doctorCount = res.doctorCount;
+            var departmentCount = res.departmentCount;
+            $("span[name=patientCount]").text(patientCount)
+            $("span[name=doctorCount]").text(doctorCount)
+            $("span[name=departmentCount]").text(departmentCount)
+        }
+    })
+
+    //叠状图
+    function createChart(departments, data) {
+
+        var chart = Highcharts.chart('container', {
+            chart: {
+                type: 'column'
+            },
+            title: {
+                text: '各科室病人感染情况'
+            },
+            xAxis: {
+                categories: ["疑似感染", "排除感染", "感染预警", "未处理"]
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: '人数'
+                },
+                stackLabels: {  // 堆叠数据标签
+                    enabled: true,
+                    style: {
+                        fontWeight: 'bold',
+                        color: (Highcharts.theme && Highcharts.theme.textColor) || 'gray'
+                    }
+                }
+            },
+            legend: {
+                align: 'right',
+                x: -30,
+                verticalAlign: 'top',
+                y: 25,
+                floating: true,
+                backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || 'white',
+                borderColor: '#CCC',
+                borderWidth: 1,
+                shadow: false
+            },
+            tooltip: {
+                formatter: function () {
+                    return '<b>' + this.x + '</b><br/>' +
+                        this.series.name + ': ' + this.y + '<br/>' +
+                        '总量: ' + this.point.stackTotal;
+                }
+            },
+            plotOptions: {
+                column: {
+                    stacking: 'normal',
+                    dataLabels: {
+                        enabled: true,
+                        color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white',
+                        style: {
+                            // 如果不需要数据标签阴影，可以将 textOutline 设置为 'none'
+                            textOutline: '1px 1px black'
+                        }
+                    }
+                }
+            },
+            series: data
+        });
+    }
+
+    //实时数据刷新
+    function activeLastPointToolip(chart) {
+        var points = chart.series[0].points;
+        chart.tooltip.refresh(points[points.length - 1]);
+    }
+
+    function createChart1() {
+        Highcharts.setOptions({
+            global: {
+                useUTC: false
+            }
+        });
+        var currentConfirmedCount = 0;
+        var confirmedCount = 0;
+        var suspectedCount = 0;
+        var curedCount = 0;
+        var deadCount = 0;
+        var currentConfirmedIncr = 0;
+        var curedIncr = 0;
+        var deadIncr = 0;
+        $.get("http://api.tianapi.com/txapi/ncov/index?key=f995a2ef046d780c6224109a910ae2aa",
+            function (data, status) {
+                currentConfirmedCount = data.newslist[0].desc.currentConfirmedCount;
+                confirmedCount = data.newslist[0].desc.confirmedCount
+                suspectedCount = data.newslist[0].desc.suspectedCount
+                curedCount = data.newslist[0].desc.curedCount
+                deadCount = data.newslist[0].desc.deadCount
+                currentConfirmedIncr = data.newslist[0].desc.currentConfirmedIncr
+                curedIncr = data.newslist[0].desc.curedIncr
+                deadIncr = data.newslist[0].desc.deadIncr
+            });
+        var chart = Highcharts.chart('container1', {
+            chart: {
+                type: 'spline',
+                marginRight: 10,
+                events: {
+                    load: function () {
+                        var series = this.series[0];
+                        var series1 = this.series[1];
+                        var that = this;
+                        chart = this;
+                        activeLastPointToolip(chart);
+                        var currentConfirmedCount = 0;
+                        var confirmedCount = 0;
+                        var suspectedCount = 0;
+                        var curedCount = 0;
+                        var deadCount = 0;
+                        var currentConfirmedIncr = 0;
+                        var curedIncr = 0;
+                        var deadIncr = 0;
+                        setInterval(function () {
+                            var x = (new Date()).getTime(); // 当前时间
+                            $.get("http://api.tianapi.com/txapi/ncov/index?key=f995a2ef046d780c6224109a910ae2aa",
+                                function (data, status) {
+                                    currentConfirmedCount = data.newslist[0].desc.currentConfirmedCount;
+                                    confirmedCount = data.newslist[0].desc.confirmedCount
+                                    suspectedCount = data.newslist[0].desc.suspectedCount
+                                    curedCount = data.newslist[0].desc.curedCount
+                                    deadCount = data.newslist[0].desc.deadCount
+                                    currentConfirmedIncr = data.newslist[0].desc.currentConfirmedIncr
+                                    curedIncr = data.newslist[0].desc.curedIncr
+                                    deadIncr = data.newslist[0].desc.deadIncr
+                                });
+                            series.addPoint([x, currentConfirmedCount], true, true);
+                            series1.addPoint([x, confirmedCount], true, true);
+                            that.series[2].addPoint([x, suspectedCount], true, true);
+                            /* this.series[3].addPoint([x, curedCount], true, true);
+                             this.series[4].addPoint([x, deadCount], true, true);
+                             this.series[5].addPoint([x, currentConfirmedIncr], true, true);
+                             this.series[6].addPoint([x, curedIncr], true, true);
+                             this.series[7].addPoint([x, deadIncr], true, true);*/
+                            activeLastPointToolip(chart);
+                        }, 1000);
+                    }
+                }
+            },
+            title: {
+                text: '动态模拟实时数据'
+            },
+            xAxis: {
+                type: 'datetime',
+                tickPixelInterval: 150
+            },
+            yAxis: {
+                title: {
+                    text: "人数"
+                }
+            },
+            tooltip: {
+                formatter: function () {
+                    return '<b>' + this.series.name + '</b><br/>' +
+                        Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) + '<br/>' +
+                        Highcharts.numberFormat(this.y, 2);
+                }
+            },
+            legend: {
+                enabled: false
+            },
+            series: [
+                {
+                    name: '现存确诊',
+                    data: (function () {
+
+                        var data = [],
+                            time = (new Date()).getTime();
+                        data.push({
+                            x: time,
+                            y: currentConfirmedCount
+                        });
+                        return data;
+                    }())
+                }
+                , {
+                    name: '累计确诊',
+                    data: (function () {
+                        var data = [],
+                            time = (new Date()).getTime();
+                        data.push({
+                            x: time,
+                            y: confirmedCount
+                        });
+                        return data;
+                    }())
+                }
+                , {
+                    name: '境外输入',
+                    data: (function () {
+                        var data = [],
+                            time = (new Date()).getTime();
+                        data.push({
+                            x: time,
+                            y: suspectedCount
+                        });
+                        return data;
+                    }())
+                }
+                /*, {
+                    name: '累计治愈',
+                    data: (function () {
+                        var data = [],
+                            time = (new Date()).getTime();
+                        data.push({
+                            x: time,
+                            y: curedCount
+                        });
+                        return data;
+                    }())
+                }
+                , {
+                    name: '累计死亡',
+                    data: (function () {
+                        var data = [],
+                            time = (new Date()).getTime();
+                        data.push({
+                            x: time,
+                            y: deadCount
+                        });
+                        return data;
+                    }())
+                }
+                , {
+                    name: '新增确诊人数',
+                    data: (function () {
+                        var data = [],
+                            time = (new Date()).getTime();
+                        data.push({
+                            x: time,
+                            y: currentConfirmedIncr
+                        });
+                        return data;
+                    }())
+                }
+                , {
+                    name: '新增治愈',
+                    data: (function () {
+                        var data = [],
+                            time = (new Date()).getTime();
+                        data.push({
+                            x: time,
+                            y: curedIncr
+                        });
+                        return data;
+                    }())
+                }
+                , {
+                    name: '新增死亡人数',
+                    data: (function () {
+                        var data = [],
+                            time = (new Date()).getTime();
+                        data.push({
+                            x: time,
+                            y: deadIncr
+                        });
+                        return data;
+                    }())
+                }*/
+            ]
+        });
+    }
+
+    $("body").on("mousemove", function (e) {
+        X = e.clientX
+        Y = e.clientY
+    })
+
+    function getDataByChart2(ganranType, departmentName) {
+        console.log(ganranType + "--" + departmentName + "病人信息")
+        $("#patient_title").html(departmentName + "--" + ganranType + "病人信息")
+        $.ajax({
+            type: "post",
+            url: "/user/findPatiensByDNameAndType",
+            data: {
+                departmentName: departmentName,
+                type: ganranType,
+                year: year1,
+                month: month1
+            },
+            success: function (res) {
+                var patients = res.patients
+                if (patients.length == 0) {
+                    alert("没相关数据")
+                    return
+                }
+                var html = ""
+                for (let i = 0; i < patients.length; i++) {
+                    var item = patients[i]
+                    html += `<tr><td>${item.id}</td><td>${item.name}</td><td>${item.phone}</td><td>${item.age}</td></tr>`
+                }
+
+                $("#patientResult").html(html)
+                $("#patientInfoClose").click(function () {
+                    $("#layer-PatientInfo").css("display", "none")
+                })
+                $("#layer-PatientInfo").css("display", "inline-block")
+                console.log(X + Y)
+                $("#layer-PatientInfo").css("top", Y - 200)
+                $("#layer-PatientInfo").css("left", X - 500)
+            }
+        })
+
+    }
+
+    //3D叠状图
+    function createChart2(data) {
+        var chart = Highcharts.chart('container1', {
+            chart: {
+                type: 'column',
+                backgroundColor: 'rgba(1,43,67,0.4)',
+                options3d: {
+                    enabled: true,
+                    alpha: 15,
+                    beta: 15,
+                    viewDistance: 25,
+                    depth: 40
+                },
+                marginTop: 80,
+                marginRight: 40
+            },
+            credits: {
+                enabled: false//不显示highCharts版权信息
+            },
+            title: {
+                text: year1 == 0 ? "" : (year1 + '年') + (month1 == 0 ? "" : (month1 + "月")) + '各科室病人感染情况'
+            },
+            xAxis: {
+                categories: ["疑似感染", "排除感染", "感染预警", "未处理"]
+            },
+            yAxis: {
+                allowDecimals: false,
+                min: 0,
+                title: {
+                    text: '病人数量'
+                }
+            },
+            tooltip: {
+                headerFormat: '<b>{point.key}</b><br>',
+                pointFormat: '<span style="color:{series.color}">\u25CF</span> {series.name}: {point.y} / {point.stackTotal}'
+            },
+            plotOptions: {
+                column: {
+                    stacking: 'normal',
+                    depth: 40,
+                    point:
+                        {
+                            events: {
+                                mouseOver: function (e) {
+                                    var type = ""
+                                    if (this.x == 0) {
+                                        type = "疑似感染"
+                                    }
+                                    if (this.x == 1) {
+                                        type = "排除感染"
+                                    }
+                                    if (this.x == 2) {
+                                        type = "感染预警"
+                                    }
+                                    if (this.x == 3) {
+                                        type = "未处理"
+                                    }
+                                    console.log(e)
+                                    getDataByChart2(type, this.series.name)
+                                },
+                                mouseOut: function (e) {
+                                    $("#layer-PatientInfo").css("display", "none")
+                                }
+                            }
+                        }
+                    ,
+                    dataLabels: {
+                        enabled: true, //设置显示对应y的值
+                        style: {
+                            color: '#000',
+                        },
+                    }
+                },
+                series: {
+                    cursor: 'pointer',
+                    events: {
+                        click: function (e) {
+                            // alert(e.point);
+                            console.log(e)
+                            getDataByChart2(e.point.category, e.point.series.name)
+                            console.log(e.point.category + ":" + e.point.series.name)
+                        }
+                    }
+                }
+            },
+            series: data
+        });
+    }
+
+    //可变化图表
+    function createChart3(data1, data2) {
+        var chart = Highcharts.chart('container', {
+            chart: {
+                backgroundColor: 'rgba(1,43,67,0.4)'
+            },
+            credits: {
+                enabled: false//不显示highCharts版权信息
+            },
+            title: {
+                text: year == 0 ? "" : (year + "年") + '医院病人年龄分布'
+            },
+            subtitle: {
+                text: ''
+            },
+            xAxis: {
+                categories: data1
+            },
+            yAxis: {
+                title: {
+                    text: '人数'
+                }
+            },
+            plotOptions: {
+                column: {
+                    pointPadding: 0.2,
+                    borderWidth: 0,
+                    dataLabels: {
+                        enabled: true, //设置显示对应y的值
+                        style: {
+                            color: '#000',
+                        },
+                    }
+                }
+            },
+            series: [{
+                type: 'column',
+                colorByPoint: true,
+                data: data2,
+                showInLegend: false
+            }]
+        });
+// 给 wrapper 添加点击事件
+        Highcharts.addEvent(document.getElementById('wrapper'), 'click', function (e) {
+            var target = e.target,
+                button = null;
+            if (target.tagName === 'BUTTON') { // 判断点的是否是 button
+                button = target.id;
+                switch (button) {
+                    case 'plain':
+                        chart.update({
+                            chart: {
+                                inverted: false,
+                                polar: false
+                            },
+                            subtitle: {
+                                text: '普通的'
+                            }
+                        });
+                        break;
+                    case 'inverted':
+                        chart.update({
+                            chart: {
+                                inverted: true,
+                                polar: false
+                            },
+                            subtitle: {
+                                text: '反转'
+                            }
+                        });
+                        break;
+                    case 'polar':
+                        chart.update({
+                            chart: {
+                                inverted: false,
+                                polar: true
+                            },
+                            subtitle: {
+                                text: '极地图'
+                            }
+                        });
+                        break;
+                }
+            }
+        });
+    }
+
+    function createChart4() {
+        // https://geojson.cn/api/data/china.topo.json
+        // https://api.map.baidu.com/geocoder?address=%E5%9F%8E%E5%B8%82%E5%90%8D%E7%A7%B0&output=json&key=37492c0ee6f924cb5e934fa08c6b1676&city=%E5%8C%97%E4%BA%AC%E5%B8%82&s=1
+        var chart = null;
+        $.getJSON('http://api.tianapi.com/txapi/ncov/index?key=f995a2ef046d780c6224109a910ae2aa', function (data) {
+            console.log(data)
+            chart = Highcharts.chart('container2', {
+                chart: {
+                    zoomType: 'x'
+                },
+                title: {
+                    text: '美元兑欧元汇率走势图'
+                },
+                subtitle: {
+                    text: document.ontouchstart === undefined ?
+                        '鼠标拖动可以进行缩放' : '手势操作进行缩放'
+                },
+                xAxis: {
+                    type: 'datetime',
+                    dateTimeLabelFormats: {
+                        millisecond: '%H:%M:%S.%L',
+                        second: '%H:%M:%S',
+                        minute: '%H:%M',
+                        hour: '%H:%M',
+                        day: '%m-%d',
+                        week: '%m-%d',
+                        month: '%Y-%m',
+                        year: '%Y'
+                    }
+                },
+                tooltip: {
+                    dateTimeLabelFormats: {
+                        millisecond: '%H:%M:%S.%L',
+                        second: '%H:%M:%S',
+                        minute: '%H:%M',
+                        hour: '%H:%M',
+                        day: '%Y-%m-%d',
+                        week: '%m-%d',
+                        month: '%Y-%m',
+                        year: '%Y'
+                    }
+                },
+                yAxis: {
+                    title: {
+                        text: '汇率'
+                    }
+                },
+                legend: {
+                    enabled: false
+                },
+                plotOptions: {
+                    area: {
+                        fillColor: {
+                            linearGradient: {
+                                x1: 0,
+                                y1: 0,
+                                x2: 0,
+                                y2: 1
+                            },
+                            stops: [
+                                [0, new Highcharts.getOptions().colors[0]],
+                                [1, new Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+                            ]
+                        },
+                        marker: {
+                            radius: 2
+                        },
+                        lineWidth: 1,
+                        states: {
+                            hover: {
+                                lineWidth: 1
+                            }
+                        },
+                        threshold: null
+                    }
+                },
+                series: [{
+                    type: 'area',
+                    name: '美元兑欧元',
+                    data: data
+                }]
+            });
+        });
+    }
+
+    function createChart7(data, names) {
+        console.log(data)
+        var chart = Highcharts.chart('container3', {
+            chart: {
+                type: 'area',
+                spacingBottom: 10,
+                backgroundColor: 'rgba(1,43,67,0.4)'
+            },
+            title: {
+                text: '各种检测情况'
+            },
+            subtitle: {
+                text: '',
+                floating: true,
+                align: 'right',
+                verticalAlign: 'bottom',
+                y: 15
+            },
+            legend: {
+                layout: 'vertical',
+                align: 'left',
+                verticalAlign: 'top',
+                x: 300,
+                y: 0,
+                floating: true,
+                borderWidth: 1,
+                backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#012E4B'
+            },
+            xAxis: {
+                categories: names
+            },
+            yAxis: {
+                title: {
+                    text: '次数'
+                },
+                labels: {
+                    formatter: function () {
+                        return this.value;
+                    }
+                }
+            },
+            tooltip: {
+                formatter: function () {
+                    return '<b>' + this.series.name + '</b><br/>' +
+                        this.x + ': ' + this.y;
+                }
+            },
+            plotOptions: {
+                area: {
+                    fillOpacity: 0.5
+                }
+            },
+            credits: {
+                enabled: false
+            },
+            series: data
+        });
+
+    }
+
+    function getPatientCheckInfo() {
+        search_patientCheck_year = $("input[name=search_patientCheck_year]").val()
+        search_patientCheck_month = $("input[name=search_patientCheck_month]").val()
+        if (search_patientCheck_year == 0 && search_patientCheck_month == 0) {
+            $.ajax({
+                type: "post",
+                url: "/user/findPatiensCheckInfo",
+                data: {
+                    year: search_patientCheck_year,
+                    month: search_patientCheck_month
+                },
+                success: function (res) {
+                    console.log(res)
+                    var list = []
+                    var list1 = []
+                    var list2 = []
+                    var names = []
+                    var normal = res.normal;
+                    var abnormal = res.abnormal
+                    var totals = res.totals;
+                    for (let i = 0; i < normal.length; i++) {
+                        var item = normal[i]
+                        names[i] = item.name
+                        var item1 = abnormal[i]
+                        var item2 = totals[i]
+                        list[i] = item.count
+                        list1[i] = item1.count
+                        list2[i] = item2.count
+                    }
+                    var data = []
+                    data[0] = {
+                        name: "检测正常(或未使用)",
+                        data: list
+                    }
+                    data[1] = {
+                        name: "检测不正常(或已使用)",
+                        data: list1
+                    }
+                    data[2] = {
+                        name: "总数据",
+                        data: list2
+                    }
+                    createChart7(data, names)
+                }
+            })
+            return;
+        }
+        if (search_patientCheck_year.length != 4) {
+            alert("请输入四位的年份")
+            return
+        }
+        if (search_patientCheck_month == 0) {
+            $.ajax({
+                type: "post",
+                url: "/user/findPatiensCheckInfo",
+                data: {
+                    year: search_patientCheck_year,
+                    month: search_patientCheck_month
+                },
+                success: function (res) {
+                    console.log(res)
+                    var list = []
+                    var list1 = []
+                    var list2 = []
+                    var names = []
+                    var normal = res.normal;
+                    var abnormal = res.abnormal
+                    var totals = res.totals;
+                    for (let i = 0; i < normal.length; i++) {
+                        var item = normal[i]
+                        names[i] = item.name
+                        var item1 = abnormal[i]
+                        var item2 = totals[i]
+                        list[i] = item.count
+                        list1[i] = item1.count
+                        list2[i] = item2.count
+                    }
+                    var data = []
+                    data[0] = {
+                        name: "检测正常(或未使用)",
+                        data: list
+                    }
+                    data[1] = {
+                        name: "检测不正常(或已使用)",
+                        data: list1
+                    }
+                    data[2] = {
+                        name: "总数据",
+                        data: list2
+                    }
+                    createChart7(data, names)
+                }
+            })
+            return;
+        }
+        if (search_patientCheck_month < 1 || search_patientCheck_month > 12) {
+            alert("请输入1-12的月份")
+            return
+        }
+        $.ajax({
+            type: "post",
+            url: "/user/findPatiensCheckInfo",
+            data: {
+                year: search_patientCheck_year,
+                month: search_patientCheck_month
+            },
+            success: function (res) {
+                console.log(res)
+                var list = []
+                var list1 = []
+                var list2 = []
+                var names = []
+                var normal = res.normal;
+                var abnormal = res.abnormal
+                var totals = res.totals;
+                for (let i = 0; i < normal.length; i++) {
+                    var item = normal[i]
+                    names[i] = item.name
+                    var item1 = abnormal[i]
+                    var item2 = totals[i]
+                    list[i] = item.count
+                    list1[i] = item1.count
+                    list2[i] = item2.count
+                }
+                var data = []
+                data[0] = {
+                    name: "检测正常(或未使用)",
+                    data: list
+                }
+                data[1] = {
+                    name: "检测不正常(或已使用)",
+                    data: list1
+                }
+                data[2] = {
+                    name: "总数据",
+                    data: list2
+                }
+                createChart7(data, names)
+            }
+        })
+    }
+
+    //获取科室与感染状态信息
+    function getDepartmentToPatients() {
+        var year11 = $("input[name=year1]").val();
+        var month11 = $("input[name=month1]").val();
+        if ((year11 == 0 && month11 == 0) || year11 == "" && month11 == "") {
+            year1 = 0
+            month1 = 0
+            var list2 = [];
+            var departments = []
+            $.ajax({
+                type: "post",
+                url: "/user/findDepartmentToPatients",
+                data: {
+                    year: year1,
+                    month: month1
+                },
+                success: function (res) {
+                    departments = res.departments
+                    var list = res.list
+
+                    for (var i = 0; i < list.length; i++) {
+                        var list1 = {
+                            name: "",
+                            data: []
+                        };
+                        var item = list[i]
+                        list1.name = item.department.departmentName;
+                        list1.data = item.counts
+                        list2[i] = list1
+                    }
+                    // createChart(departments, list2)
+                    createChart2(list2)
+                }
+            })
+            return;
+        }
+        if (year11 == "" || year11.length < 4 || year11.length > 4) {
+            alert("请输入4位数年份")
+            return
+        }
+        if (month11 == "") {
+            month11 = 0
+        }
+        if (month11 < 0 || month11 > 12) {
+            alert("请输入1至12月份")
+            return
+        }
+        year1 = year11
+        month1 = month11
+        var list2 = [];
+        var departments = []
+        $.ajax({
+            type: "post",
+            url: "/user/findDepartmentToPatients",
+            data: {
+                year: year1,
+                month: month1
+            },
+            success: function (res) {
+                departments = res.departments
+                var list = res.list
+
+                for (var i = 0; i < list.length; i++) {
+                    var list1 = {
+                        name: "",
+                        data: []
+                    };
+                    var item = list[i]
+                    list1.name = item.department.departmentName;
+                    list1.data = item.counts
+                    list2[i] = list1
+                }
+                // createChart(departments, list2)
+                createChart2(list2)
+            }
+        })
+    }
+
+    //获取病人年龄范围
+    function getPatientsByAgeRange() {
+        var year_1 = $("input[name=year]").val();
+        if (year_1 == "" || year_1.length < 4 || year_1.length > 4) {
+            alert("请输入4位数年份")
+            return
+        }
+        year = year_1
+        $.ajax({
+            type: "post",
+            url: "/user/findPatientsByAgeRange",
+            data: {
+                year: year
+            },
+            success: function (res) {
+                var list = res.list
+                var descriptions = [];
+                var counts = []
+                for (var i = 0; i < list.length; i++) {
+
+                    var list1 = []
+                    var item = list[i]
+                    descriptions[i] = item.description
+                    counts[i] = item.counts
+                }
+                createChart3(descriptions, counts)
+            }
+        })
+    }
+
+    $("#getDepartmentToPatients").click(function () {
+        console.log("Department")
+        getDepartmentToPatients()
+    })
+    $("#getPatientsByAgeRange").click(function () {
+        console.log("PatientsByAgeRange")
+        getPatientsByAgeRange()
+    })
+    $("#getPatientCheckInfo").click(function () {
+        console.log("PatientCheckInfo")
+        getPatientCheckInfo()
+    })
+    var list2 = [];
+    $.ajax({
+        type: "post",
+        url: "/user/findPatientsByAgeRange",
+        data: {
+            year: year
+        },
+        success: function (res) {
+            var list = res.list
+            var descriptions = [];
+            var counts = []
+            for (var i = 0; i < list.length; i++) {
+
+                var list1 = []
+                var item = list[i]
+                descriptions[i] = item.description
+                counts[i] = item.counts
+            }
+            createChart3(descriptions, counts)
+        }
+    })
+    $.ajax({
+        type: "post",
+        url: "/user/findDepartmentToPatients",
+        data: {
+            year: year1,
+            month: month1
+        },
+        success: function (res) {
+            // departments = res.departments
+            var list = res.list
+
+            for (var i = 0; i < list.length; i++) {
+                var list1 = {
+                    name: "",
+                    data: []
+                };
+                var item = list[i]
+                list1.name = item.department.departmentName;
+                list1.data = item.counts
+                list2[i] = list1
+            }
+            // createChart(departments, list2)
+            createChart2(list2)
+        }
+    })
+    // todo 疫情信息链接已失效
+    /*$("#searchByDate").click(function () {
+        var date = $("#myDate").val();
+        createChart5(date)
+    })
+    // createChart4()
+    createChart5("")*/
+
+    getPatientCheckInfo()
+
+    new Vue({
+        el: "#dcims",
+        data: {
+            localhost: "http://192.168.150.130:8089",
+            formLabelWidth: "120px",
+            dialogFormVisible: false,
+            warnRecordTable: false,
+            no_read_count: 0,
+            hidden: false,
+            activeName: "first",
+            warnRecords: [],
+            warnRecords1: [],
+            total: 0,
+            pageNum: 1,
+            total1: 0,
+            pageNum1: 1,
+            pageSize: 3,
+        },
+        methods: {
+            handleClick: function (item) {
+                if (item.index == 0) {
+                    this.lookWarn(0)
+                    return;
+                } else {
+                    var that = this;
+                    $.ajax({
+                        type: "post",
+                        url: this.localhost + "/warnRecord/findWarnRecordListByStatus",
+                        data: {
+                            pageNum: 1,
+                            pageSize: this.pageSize,
+                            status: 1
+                        },
+                        success: function (res) {
+                            that.warnRecords1 = res.warnRecords
+                            that.total1 = res.total
+                        }
+                    })
+                    return;
+                }
+            },
+            lookWarn: function (status) {
+                var that = this;
+                $.ajax({
+                    type: "post",
+                    url: this.localhost + "/warnRecord/findWarnRecordListByStatus",
+                    data: {
+                        pageNum: 1,
+                        pageSize: this.pageSize,
+                        status: status
+                    },
+                    success: function (res) {
+                        that.warnRecords = res.warnRecords
+                        that.no_read_count = res.total
+                        if (that.no_read_count == 0) {
+                            that.hidden = true
+                        }
+                        that.total = res.total
+                    }
+                })
+            },
+            current_change: function (currentPage) {
+                this.pageNum = currentPage;
+                var that = this;
+                $.ajax({
+                    type: "post",
+                    url: this.localhost + "/warnRecord/findWarnRecordListByStatus",
+                    data: {
+                        pageNum: this.pageNum,
+                        pageSize: this.pageSize,
+                        status: 0
+                    },
+                    success: function (res) {
+                        that.warnRecords = res.warnRecords
+                        that.total1 = res.total
+                    }
+                })
+            },
+            current_change1: function (currentPage) {
+                this.pageNum = currentPage;
+                var that = this;
+                $.ajax({
+                    type: "post",
+                    url: this.localhost + "/warnRecord/findWarnRecordListByStatus",
+                    data: {
+                        pageNum: this.pageNum1,
+                        pageSize: this.pageSize,
+                        status: 1
+                    },
+                    success: function (res) {
+                        that.warnRecords1 = res.warnRecords
+                        that.total1 = res.total
+                    }
+                })
+            },
+            read: function (id) {
+                var that = this
+                $.ajax({
+                    type: "post",
+                    url: this.localhost + "/warnRecord/updWarnRecordListStatus",
+                    data: {
+                        id: id
+                    },
+                    success: function (res) {
+                        if (res.flag) {
+                            that.$message({
+                                message: '已阅读信息',
+                                type: 'success'
+                            });
+                            that.lookWarn(0)
+                        } else {
+                            that.$message({
+                                message: '阅读信息失败',
+                                type: 'error'
+                            });
+                        }
+                    }
+                })
+            },
+            look: function () {
+                this.lookWarn(0)
+                this.warnRecordTable = true
+            },
+        },
+        created: function () {
+            var that = this;
+            $.ajax({
+                type: "post",
+                url: this.localhost + "/warnRecord/findWarnRecordListByStatus",
+                data: {
+                    pageNum: 1,
+                    pageSize: 3,
+                    status: 0
+                },
+                success: function (res) {
+                    that.no_read_count = res.total
+                    if (that.no_read_count == 0) {
+                        that.hidden = true
+                    }
+                }
+            })
+        }
+    })
+</script>
+</body>
+</html>

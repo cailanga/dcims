@@ -1,0 +1,1207 @@
+<!doctype html>
+<html class="no-js" lang="zxx">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>医院感染信息监测系统 </title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Place favicon.ico in the root Internist, General Practitonery -->
+
+    <!-- CSS here -->
+    <link rel="stylesheet" href="../../css/bootstrap.min.css">
+    <link rel="stylesheet" href="../../css/animate.min.css">
+    <link rel="stylesheet" href="../../css/magnific-popup.css">
+    <link rel="stylesheet" href="../../fontawesome/css/all.min.css">
+    <link rel="stylesheet" href="../../css/dripicons.css">
+    <link rel="stylesheet" href="../../css/slick.css">
+    <link rel="stylesheet" href="../../css/default.css">
+    <link rel="stylesheet" href="../../css/meanmenu.css">
+    <link rel="stylesheet" href="../../css/style.css">
+
+
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <script src="/js/jquery-3.3.1.min.js"></script>
+    <script src="/js/vue.min.js"></script>
+    <script src="/js/axios.js"></script>
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+
+
+    <link rel="stylesheet" href="../../css/responsive.css">
+    <style type="text/css">
+        .user {
+            display: inline;
+        }
+
+        .patient {
+            width: 350px;
+            /* height: 400px; */
+            background-color: #D9E6F5;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /*动画加载*/
+        .loading {
+            position: fixed;
+            left: 0;
+            top: 0;
+            /*background: url('/img/three-dots.svg') center center no-repeat #fff;*/
+            background-color: white;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1000;
+            /*opacity: 0.8;*/
+        }
+
+        .main {
+            height: 100px;
+            width: 100px;
+            margin: 200px auto
+        }
+
+        .main div {
+            color: #799761;
+            margin: 50px auto;
+        }
+
+        svg {
+            fill: none
+        }
+
+        .load {
+            stroke-width: 15px;
+            stroke-dasharray: 252;
+            stroke-dashoffset: 0;
+            animation: load 1.5s ease-in-out infinite;
+            transform-origin: center center
+
+        }
+
+        .one {
+            stroke: #b8d8d7;
+        }
+
+        .two {
+            stroke: #73c0b0;
+            animation-delay: 0.1s;
+        }
+
+        .three {
+            stroke: #4d8f8e;
+            animation-delay: 0.2s
+        }
+
+        @keyframes load {
+            0%, 100% {
+                stroke-dashoffset: 252
+            }
+            50% {
+                stroke-dashoffset: 230
+            }
+            100% {
+                transform: rotate(360deg)
+            }
+        }
+
+        .jump {
+            animation: jump 0.5s ease-in-out infinite
+        }
+
+        .first {
+            fill: #b8d8d7;
+        }
+
+        .second {
+            fill: #73c0b0;
+            animation-delay: 0.1s;
+        }
+
+        .third {
+            fill: #4d8f8e;
+            animation-delay: 0.2s;
+        }
+
+        @keyframes jump {
+            0%, 100% {
+                transform: translateY(0)
+            }
+            50% {
+                transform: translateY(-10px)
+            }
+        }
+
+        .el-dialog {
+            width: 30%;
+        }
+
+        .el-dialog__header {
+            text-align: center;
+        }
+
+        .dialog-footer {
+            text-align: center;
+        }
+
+        .pt-120 {
+            padding-top: 50px;
+        }
+
+        .second-menu .main-menu ul li:nth-child(2) {
+            border-bottom: #0b3e6f 3px solid;
+        }
+
+    </style>
+</head>
+<body>
+<!-- header -->
+<div class="headerpage_m"></div>
+<!-- header-end -->
+<!-- main-area -->
+<main id="dcims">
+    <!-- breadcrumb-area -->
+    <section class="breadcrumb-area d-flex align-items-center" style="background-color: #82A2C2;min-height: 100px">
+        <div class="container">
+            <div class="row">
+                <div class="col-xl-6 offset-xl-3 col-lg-8 offset-lg-2">
+                    <div class="breadcrumb-wrap text-center">
+                        <div class="breadcrumb-title mb-30">
+                            <h2>病人管理</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <div v-if="isLoading" class="loading">
+        <div class="main">
+            <svg viewBox="0 0 120 120">
+                <circle class="load one" cx="60" cy="60" r="40"></circle>
+                <circle class="load two" cx="60" cy="60" r="40"></circle>
+                <circle class="load three" cx="60" cy="60" r="40"></circle>
+                <circle class="jump first" cx="45" cy="60" r="5"></circle>
+                <circle class="jump second" cx="60" cy="60" r="5"></circle>
+                <circle class="jump third" cx="75" cy="60" r="5"></circle>
+            </svg>
+        </div>
+    </div>
+    <!-- shop-area -->
+    <section class="shop-area pt-120 pb-120 p-relative wow fadeInUp animated" data-animation="fadeInUp animated"
+             data-delay=".2s">
+
+        <div class="container">
+            <div style="margin: 5px">
+                <button @click="addPatientInfo">添加病人信息</button>
+            </div>
+            <el-table
+                    border
+                    :data="PatientInfos.slice((currentPage-1)*pagesize,currentPage*pagesize)"
+                    stripe
+                    style="width: 100%">
+                <el-table-column
+                        fixed
+                        show-overflow-tooltip
+                        prop="id"
+                        label="编号"
+                >
+                </el-table-column>
+                <el-table-column
+                        show-overflow-tooltip
+                        prop="name"
+                        label="姓名"
+                >
+                </el-table-column>
+                <el-table-column
+                        show-overflow-tooltip
+                        prop="age"
+                        label="年龄"
+                >
+                </el-table-column>
+                <el-table-column
+                        prop="sex"
+                        label="性别"
+                >
+                </el-table-column>
+                <el-table-column
+                        show-overflow-tooltip
+                        prop="phone"
+                        label="手机号"
+                >
+                </el-table-column>
+                <el-table-column
+                        show-overflow-tooltip
+                        prop="department.departmentName"
+                        label="科室名称"
+                >
+                </el-table-column>
+                <el-table-column
+                        show-overflow-tooltip
+                        prop="doctor.doctorName"
+                        label="主治医生"
+                >
+                </el-table-column>
+                <el-table-column
+                        show-overflow-tooltip
+                        prop="bedNumber"
+                        label="病床"
+                >
+                </el-table-column>
+                <el-table-column fixed="right" label="操作" width="200">
+                    <template slot-scope="scope">
+                        <div style="text-align: center">
+                            <div style="text-align: center">
+                                <el-button
+                                        size="mini"
+                                        type="primary"
+                                        @click="updPatientInfo(scope.row)">修改
+                                </el-button>
+
+                            </div>
+                            <div style="text-align: center;margin-top: 3px">
+                                <el-button
+                                        size="mini"
+                                        type="primary"
+                                        @click="lookPatientPTarget(scope.row)">查看感染检测信息
+                                </el-button>
+                            </div>
+                            <div style="text-align: center;margin-top: 3px">
+                                <el-button
+                                        size="small"
+                                        type="primary"
+                                        @click="addPatientPTarget(scope.row)">添加感染检测
+                                </el-button>
+                            </div>
+                            <div style="text-align: center;margin-top: 3px">
+                                <el-button
+                                        size="small"
+                                        type="primary"
+                                        @click="creatReportCard(scope.row)">生成报卡
+                                </el-button>
+                            </div>
+                        </div>
+                        <!--fullscreen-->
+                        </el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <!-- 分页信息 -->
+            <div class="pagination-wrap mt-50 text-center">
+                <div style="text-align: center;margin-top: 30px;">
+                    <el-pagination
+                            :page-size="pagesize"
+                            background
+                            layout="prev, pager, next"
+                            :total="total"
+                            @current-change="current_change">
+                    </el-pagination>
+                </div>
+            </div>
+        </div>
+    </section>
+    <el-dialog title="修改病人信息" :show-close="false" :visible.sync="PatientInfoUpddialogFormVisible">
+        <el-form :model="PatientInfo">
+            <el-form-item label="姓名" :label-width="formLabelWidth">
+                <el-input placeholder="请输入姓名" v-model="PatientInfo.name" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="年龄" :label-width="formLabelWidth">
+                <el-input type="number" placeholder="请输入年龄" v-model="PatientInfo.age" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="性别" :label-width="formLabelWidth">
+                <el-select v-model="PatientInfo.sex" placeholder="请选择">
+                    <el-option
+                            key="男"
+                            label="男"
+                            value="男">
+                    </el-option>
+                    <el-option
+                            key="女"
+                            label="女"
+                            value="女">
+                    </el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="手机号" :label-width="formLabelWidth">
+                <el-input type="number" placeholder="请输入手机号" v-model="PatientInfo.phone" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="所属科室" :label-width="formLabelWidth">
+                <el-select class="form-horizontal" v-model="PatientInfo.departmentNo" @change="selDepartment">
+                    <el-option :value="item.departmentNo" :label="item.departmentName" v-for="item in departments">
+                        {{item.departmentName}}
+                    </el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="病房" :label-width="formLabelWidth">
+                <el-select class="form-horizontal" v-model="bedRoom.bedRoomName" @change="selBedRoom">
+                    <el-option :value="item.bedRoomName" v-for="item in bedRooms">{{item.bedRoomName}}</el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="病床" :label-width="formLabelWidth">
+                <el-select class="form-horizontal" v-model="sickBed.sickBedNo">
+                    <el-option :disabled="item.pid!=0" :value="item.sickBedNo" v-for="item in sickBeds">
+                        {{item.sickBedNo}}
+                    </el-option>
+                </el-select>
+            </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="updatePatientInfoCancel">取 消</el-button>
+            <el-button type="primary" @click="updatePatientInfoOk">确 定</el-button>
+        </div>
+    </el-dialog>
+    <el-dialog title="添加病人信息" :show-close="false" :visible.sync="PatientInfoAdddialogFormVisible">
+        <el-form :model="PatientInfo">
+            <el-form-item label="姓名" :label-width="formLabelWidth">
+                <el-input placeholder="请输入姓名" v-model="PatientInfo.name" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="年龄" :label-width="formLabelWidth">
+                <el-input type="number" placeholder="请输入年龄" v-model="PatientInfo.age" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="性别" :label-width="formLabelWidth">
+                <el-select v-model="PatientInfo.sex" placeholder="请选择">
+                    <el-option
+                            key="男"
+                            label="男"
+                            value="男">
+                    </el-option>
+                    <el-option
+                            key="女"
+                            label="女"
+                            value="女">
+                    </el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="手机号" :label-width="formLabelWidth">
+                <el-input type="number" placeholder="请输入手机号" v-model="PatientInfo.phone" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="所属科室" :label-width="formLabelWidth">
+                <el-select class="form-horizontal" v-model="PatientInfo.departmentNo" @change="selDepartment">
+                    <el-option :label="item.departmentName" :value="item.departmentNo" v-for="item in departments">
+                        {{item.departmentName}}
+                    </el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="病房" :label-width="formLabelWidth">
+                <el-select class="form-horizontal" v-model="bedRoom.bedRoomName" @change="selBedRoom">
+                    <el-option :value="item.bedRoomName" v-for="item in bedRooms">{{item.bedRoomName}}</el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="病床" :label-width="formLabelWidth">
+                <el-select class="form-horizontal" v-model="sickBed.sickBedNo">
+                    <el-option :disabled="item.pid!=0" :value="item.sickBedNo" v-for="item in sickBeds"></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="诊断类型" :label-width="formLabelWidth">
+                <el-select class="form-horizontal" v-model="PatientInfo.diagnosisTypeNo">
+                    <el-option :label="item.diagnosisTypeName" :value="item.diagnosisTypeNo"
+                               v-for="item in diagnosisTypes">
+                    </el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="记录时间" :label-width="formLabelWidth">
+                <el-date-picker
+                        v-model="PatientInfo.recordDate"
+                        type="datetime"
+                        placeholder="选择日期时间"
+                        align="right"
+                        :picker-options="pickerOptions">
+                </el-date-picker>
+            </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="addPatientInfoCancel">取 消</el-button>
+            <el-button type="primary" @click="addPatientInfoOk">确 定</el-button>
+        </div>
+    </el-dialog>
+    <el-dialog title="添加感染检测信息" :show-close="false" :visible.sync="PatientPTargetAdddialogFormVisible">
+        <el-form :model="patientPTarget">
+            <el-form-item label="感染检测类型" :label-width="formLabelWidth">
+                <el-select class="form-horizontal" v-model="patientPTarget.pTargetNo">
+                    <el-option :label="item.pTargetName" :value="item.pTargetNo"
+                               v-for="item in patientTargets"></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="记录时间" :label-width="formLabelWidth">
+                <el-date-picker
+                        v-model="patientPTarget.recordTime"
+                        type="datetime"
+                        placeholder="选择日期时间"
+                        align="right"
+                        :picker-options="pickerOptions">
+                </el-date-picker>
+            </el-form-item>
+            <el-form-item label="对应值" :label-width="formLabelWidth">
+                <el-input placeholder="请输入值" v-model="patientPTarget.value" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="对应单位" :label-width="formLabelWidth">
+                <el-input placeholder="请输入对应单位" v-model="patientPTarget.unit" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="状态" :label-width="formLabelWidth">
+                <el-select v-model="patientPTarget.status" placeholder="请选择">
+                    <el-option
+                            key="0"
+                            label="正常"
+                            :value="0">
+                    </el-option>
+                    <el-option
+                            key="1"
+                            label="不正常"
+                            :value="1">
+                    </el-option>
+                </el-select>
+            </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="addPatientPTargetCancel">取 消</el-button>
+            <el-button type="primary" @click="addPatientPTargetOk">确 定</el-button>
+        </div>
+    </el-dialog>
+    <el-dialog width="50%" title="查看感染检测信息" :show-close="false" :visible.sync="PatientPTargetLookdialogFormVisible">
+        <el-table
+                border
+                :data="patientPTargets.slice((AcurrentPage-1)*Apagesize,AcurrentPage*Apagesize)"
+                stripe
+                style="width: 100%">
+            <el-table-column
+                    show-overflow-tooltip
+                    prop="patientId"
+                    label="病人编号"
+            >
+            </el-table-column>
+            <el-table-column
+                    prop="patientinfo.name"
+                    label="姓名"
+            >
+            </el-table-column>
+            <el-table-column
+                    show-overflow-tooltip
+                    prop="patientTarget.pTargetName"
+                    label="检测类型"
+            >
+            </el-table-column>
+            <el-table-column
+                    show-overflow-tooltip
+                    prop="recordTimeStr"
+                    label="记录时间"
+            >
+            </el-table-column>
+            <el-table-column
+                    show-overflow-tooltip
+                    prop="value"
+                    label="检测值"
+            >
+            </el-table-column>
+            <el-table-column
+                    show-overflow-tooltip
+                    prop="unit"
+                    label="单位"
+            >
+            </el-table-column>
+        </el-table>
+        <!-- 分页信息 -->
+        <div class="pagination-wrap mt-50 text-center">
+            <div style="text-align: center;margin-top: 30px;">
+                <el-pagination
+                        :page-size="Apagesize"
+                        background
+                        layout="prev, pager, next"
+                        :total="Atotal"
+                        @current-change="current_changeA">
+                </el-pagination>
+            </div>
+        </div>
+        <div slot="footer" class="dialog-footer">
+            <el-button type="primary" @click="lookPatientPTargetOk">确 定</el-button>
+        </div>
+    </el-dialog>
+    <el-dialog width="50%" title="报卡生成" :show-close="false" :visible.sync="reportCardDialogFormVisible">
+        <el-form :model="reportCard">
+            <el-form-item label="病程分析" :label-width="formLabelWidth">
+                <el-input type="textarea" autosize placeholder="请输入" v-model="reportCard.courseAnalysis"
+                          auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="预警状态" :label-width="formLabelWidth">
+                <div style="margin-top: 20px">
+                    <el-radio v-model="reportCard.warnStatus" :label="1" border size="medium">新预警</el-radio>
+                    <el-radio v-model="reportCard.warnStatus" :label="2" border size="medium">旧预警</el-radio>
+                </div>
+            </el-form-item>
+            <el-form-item label="社区感染" :label-width="formLabelWidth">
+                <div style="margin-top: 20px">
+                    <el-radio v-model="reportCard.cstatus" :label="1" border size="medium">是</el-radio>
+                    <el-radio v-model="reportCard.cstatus" :label="0" border size="medium">否</el-radio>
+                </div>
+            </el-form-item>
+            <el-form-item label="是否已监测手术" :label-width="formLabelWidth">
+                <div style="margin-top: 20px">
+                    <el-radio v-model="reportCard.isOperation" :label="1" border size="medium">是</el-radio>
+                    <el-radio v-model="reportCard.isOperation" :label="0" border size="medium">否</el-radio>
+                </div>
+            </el-form-item>
+            <el-form-item label="是否已出院" :label-width="formLabelWidth">
+                <div style="margin-top: 20px">
+                    <el-radio v-model="reportCard.isLeaveHospital" :label="1" border size="medium">是</el-radio>
+                    <el-radio v-model="reportCard.isLeaveHospital" :label="0" border size="medium">否</el-radio>
+                </div>
+            </el-form-item>
+            <el-form-item label="是否检出病原体" :label-width="formLabelWidth">
+                <div style="margin-top: 20px">
+                    <el-radio v-model="reportCard.isCheckedPathogen" :label="1" border size="medium">是</el-radio>
+                    <el-radio v-model="reportCard.isCheckedPathogen" :label="0" border size="medium">否</el-radio>
+                </div>
+            </el-form-item>
+            <el-form-item label="是否侵入性操作" :label-width="formLabelWidth">
+                <div style="margin-top: 20px">
+                    <el-radio v-model="reportCard.isInvade" :label="1" border size="medium">是</el-radio>
+                    <el-radio v-model="reportCard.isInvade" :label="0" border size="medium">否</el-radio>
+                </div>
+            </el-form-item>
+            <el-form-item label="入院诊断类型" :label-width="formLabelWidth">
+                <el-input placeholder="请输入" v-model="reportCard.patientinfo.diagnosisTypes[0].diagnosisTypeName"
+                          auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="是否多重耐药" :label-width="formLabelWidth">
+                <div style="margin-top: 20px">
+                    <el-radio v-model="reportCard.isMultiMedical" :label="1" border size="medium">是</el-radio>
+                    <el-radio v-model="reportCard.isMultiMedical" :label="0" border size="medium">否</el-radio>
+                </div>
+            </el-form-item>
+            <el-form-item label="是否使用抗菌药物" :label-width="formLabelWidth">
+                <div style="margin-top: 20px">
+                    <el-radio v-model="reportCard.isUseMedical" :label="1" border size="medium">是</el-radio>
+                    <el-radio v-model="reportCard.isUseMedical" :label="0" border size="medium">否</el-radio>
+                </div>
+            </el-form-item>
+            <el-form-item label="体温是否正常" :label-width="formLabelWidth">
+                <div style="margin-top: 20px">
+                    <el-radio v-model="reportCard.tisNormal" :label="1" border size="medium">否</el-radio>
+                    <el-radio v-model="reportCard.tisNormal" :label="0" border size="medium">是</el-radio>
+                </div>
+            </el-form-item>
+            <el-form-item label="科室" :label-width="formLabelWidth">
+                <el-input placeholder="请输入" v-model="reportCard.patientinfo.department.departmentName"
+                          auto-complete="off"></el-input>
+            </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="creatReportCardCancel">取 消</el-button>
+            <el-button type="primary" @click="creatReportCardOk">生成报卡</el-button>
+        </div>
+    </el-dialog>
+
+    <!-- shop-area-end -->
+</main>
+<!-- main-area-end -->
+<!-- footer -->
+
+<!-- footer-end -->
+<div class="footerpage_m"></div>
+
+<!-- JS here -->
+<!-- JS here -->
+<script src="../../js/vendor/modernizr-3.5.0.min.js"></script>
+<script src="../../js/vendor/jquery-1.12.4.min.js"></script>
+<script src="../../js/popper.min.js"></script>
+<script src="../../js/bootstrap.min.js"></script>
+<script src="../../js/one-page-nav-min.js"></script>
+<script src="../../js/jquery.meanmenu.min.js"></script>
+<script src="../../js/slick.min.js"></script>
+<script src="../../js/ajax-form.js"></script>
+<script src="../../js/paroller.js"></script>
+<script src="../../js/wow.min.js"></script>
+<script src="../../js/js_isotope.pkgd.min.js"></script>
+<script src="../../js/imagesloaded.min.js"></script>
+<script src="../../js/parallax.min.js"></script>
+<script src="../../js/jquery.waypoints.min.js"></script>
+<script src="../../js/jquery.counterup.min.js"></script>
+<script src="../../js/jquery.scrollUp.min.js"></script>
+<script src="../../js/parallax-scroll.js"></script>
+<script src="../../js/jquery.magnific-popup.min.js"></script>
+<script src="../../js/element-in-view.js"></script>
+<script src="../../js/main.js"></script>
+<script>
+    $(function () {
+        //调用公共代码
+        $('.footerpage_m').load('/commons/footer.html');
+        $('.headerpage_m').load('/commons/header.html');
+
+        $(".exit").click(function logout() {
+            $.ajax({
+                type: "post",
+                url: "/logout",
+                dataType: "json",
+                data: {},
+                success: function (res) {
+                    if (res.code == 200) {
+                        window.location.href = "http://192.168.150.130:8089/pages/login.html";
+                    } else {
+                        alert("退出失败")
+                    }
+                }
+            })
+        })
+
+        new Vue({
+            el: "#dcims",
+            data: {
+                localhost: "http://192.168.150.130:8089",
+                total: 0,
+                pagesize: 4,
+                currentPage: 1,
+                Atotal: 0,
+                Apagesize: 4,
+                AcurrentPage: 1,
+                pickerOptions: {
+                    shortcuts: [{
+                        text: '今天',
+                        onClick(picker) {
+                            picker.$emit('pick', new Date());
+                        }
+                    }, {
+                        text: '昨天',
+                        onClick(picker) {
+                            const date = new Date();
+                            date.setTime(date.getTime() - 3600 * 1000 * 24);
+                            picker.$emit('pick', date);
+                        }
+                    }, {
+                        text: '一周前',
+                        onClick(picker) {
+                            const date = new Date();
+                            date.setTime(date.getTime() - 3600 * 1000 * 24 * 7);
+                            picker.$emit('pick', date);
+                        }
+                    }]
+                },
+                formLabelWidth: "120px",
+                departments: [],
+                sickBeds: [],
+                sickBed: {
+                    sickBedNo: ""
+                },
+                bedRoom: {
+                    bedRoomName: ""
+                },
+                bedRooms: [],
+                PatientInfos: [],
+                diagnosisTypes: [],
+                PatientInfo: {
+                    name: "",
+                    age: "",
+                    sex: "",
+                    phone: "",
+                    departmentNo: "",
+                    bedNumber: "",
+                    diagnosisTypeNo: "",
+                    recordDate: ""
+                },
+                patientTargets: [],
+                patientPTargets: [],
+                patientPTarget: {
+                    patientId: "",
+                    pTargetNo: "",
+                    recordTime: "",
+                    status:0,
+                    value: "",
+                    unit: ""
+                },
+                user: {},
+                userOne: {},
+                nowDate: "",
+                isLoading: true,
+                PatientInfoUpddialogFormVisible: false,
+                PatientInfoAdddialogFormVisible: false,
+                PatientPTargetAdddialogFormVisible: false,
+                PatientPTargetLookdialogFormVisible: false,
+                reportCardDialogFormVisible: false,
+                reportCard: {
+                    courseAnalysis:"",
+                    warnStatus:1,
+                    cstatus:0,
+                    isOperation:0,
+                    isLeaveHospital:0,
+                    isCheckedPathogen:0,
+                    isInvade:0,
+                    patientinfo: {
+                        name:"",
+                        department: {
+                            departmentName:""
+                        },
+                        diagnosisTypes:[
+                            {
+                                diagnosisTypeName:""
+                            }
+                        ]
+                    },
+                    isMultiMedical:0,
+                    isUseMedical:0,
+                    tisNormal:0,
+
+                },
+            },
+            methods: {
+                selDepartment: function () {
+                    this.sickBed = {
+                        sickBedNo: ""
+                    }
+                    this.bedRoom = {
+                        bedRoomName: ""
+                    }
+                    this.sickBeds = []
+                    this.bedRooms = []
+                    var that = this;
+                    $.ajax({
+                        url: this.localhost + "/doctor/findBedRoomsByDno",
+                        type: "post",
+                        data: {departmentNo: this.PatientInfo.departmentNo},
+                        success: function (res) {
+                            that.bedRooms = res.bedRooms
+                        }
+                    })
+                },
+                selBedRoom: function () {
+                    this.sickBed = {
+                        sickBedNo: ""
+                    }
+
+                    this.sickBeds = []
+                    var that = this;
+                    $.ajax({
+                        url: this.localhost + "/doctor/findSickBedsByBedRoom",
+                        type: "post",
+                        data: this.bedRoom,
+                        success: function (res) {
+                            that.sickBeds = res.sickBeds
+                        }
+                    })
+                },
+                getPatients: function () {
+                    var that = this;
+                    $.ajax({
+                        url: this.localhost + "/doctor/findAllPatientInfos",
+                        type: "post",
+                        data: {},
+                        success: function (res) {
+                            that.PatientInfos = res.PatientInfos
+                            that.departments = res.departments
+                            that.total = that.PatientInfos.length
+                            that.isLoading = false
+                        }
+                    })
+                },
+                current_change: function (currentPage) {
+                    this.currentPage = currentPage;
+                },
+                logout: function () {
+                    $.ajax({
+                        type: "post",
+                        url: this.localhost + "/logout",
+                        dataType: "json",
+                        data: {},
+                        success: function (res) {
+                            if (res.code == 200) {
+                                window.location.href = "http://192.168.150.130:8089/pages/login.html";
+                            } else {
+                                alert("退出失败")
+                            }
+                        }
+                    })
+                },
+                updPatientInfo: function (PatientInfo) {
+                    if (PatientInfo.bedNumber == null) {
+                        this.sickBed = {
+                            sickBedNo: ""
+                        }
+                        this.bedRoom = {
+                            bedRoomName: ""
+                        }
+                        this.sickBeds = []
+                        this.bedRooms = []
+                    } else {
+                        var that = this;
+                        $.ajax({
+                            url: this.localhost + "/doctor/findBedRoomsByDno",
+                            type: "post",
+                            data: {departmentNo: PatientInfo.departmentNo},
+                            success: function (res) {
+                                that.bedRooms = res.bedRooms
+                            }
+                        })
+                        var split = PatientInfo.bedNumber.split("-")
+                        this.bedRoom.bedRoomName = split[0];
+                        $.ajax({
+                            url: this.localhost + "/doctor/findSickBedsByBedRoom",
+                            type: "post",
+                            data: this.bedRoom,
+                            success: function (res) {
+                                that.sickBeds = res.sickBeds
+                            }
+                        })
+                    }
+
+                    this.sickBed.sickBedNo = split[1]
+                    var patientInfo = JSON.parse(JSON.stringify(PatientInfo))
+                    this.PatientInfo = {
+                        id: PatientInfo.id,
+                        name: PatientInfo.name,
+                        age: PatientInfo.age,
+                        sex: PatientInfo.sex,
+                        phone: PatientInfo.phone,
+                        departmentNo: PatientInfo.departmentNo,
+                        bedNumber: PatientInfo.bedNumber,
+                        diagnosisTypeNo: "",
+                        recordDate: ""
+                    };
+                    this.PatientInfoUpddialogFormVisible = true;
+                },
+                updatePatientInfoOk: function () {
+                    var that = this;
+                    if ((this.PatientInfo.name == ""
+                            || this.PatientInfo.age == ""
+                            || this.PatientInfo.sex == ""
+                            || this.PatientInfo.phone == ""
+                            || this.PatientInfo.departmentNo == "")
+                        || (this.bedRoom.bedRoomName != ""
+                            && this.sickBed.sickBedNo == "")) {
+                        this.$message({
+                            message: '请完善信息再提交',
+                            center: true,
+                            type: 'warning'
+                        });
+                        return;
+                    }
+                    if (this.bedRoom.bedRoomName != ""
+                        && this.sickBed.sickBedNo != "") {
+                        this.PatientInfo.bedNumber = this.bedRoom.bedRoomName + "-" + this.sickBed.sickBedNo
+                    }
+                    $.ajax({
+                        url: this.localhost + "/doctor/updPatientInfo",
+                        type: "post",
+                        data: this.PatientInfo,
+                        success: function (res) {
+                            that.isLoading = false
+                            if (res.flag) {
+                                that.$message({
+                                    message: '修改成功',
+                                    center: true,
+                                    type: 'success'
+                                });
+                                that.getPatients();
+                            } else {
+                                that.$message({
+                                    message: '修改失败',
+                                    center: true,
+                                    type: 'error'
+                                });
+                            }
+                        }
+                    })
+                    this.PatientInfoUpddialogFormVisible = false;
+                },
+                updatePatientInfoCancel: function () {
+                    this.PatientInfoUpddialogFormVisible = false;
+                },
+                getDiagnosisTypes: function () {
+                    var that = this;
+                    $.ajax({
+                        url: this.localhost + "/doctor/findAllDiagnosisTypes",
+                        type: "post",
+                        data: {},
+                        success: function (res) {
+                            that.diagnosisTypes = res.diagnosisTypes
+                        }
+                    })
+                },
+                addPatientInfo: function (PatientInfo) {
+                    this.sickBeds = []
+                    this.bedRooms = []
+                    this.getDiagnosisTypes()
+                    this.PatientInfo = {
+                        name: "",
+                        age: "",
+                        sex: "",
+                        phone: "",
+                        departmentNo: "",
+                        bedNumber: "",
+                        diagnosisTypeNo: "",
+                        recordDate: ""
+                    };
+                    this.PatientInfoAdddialogFormVisible = true;
+                },
+                addPatientInfoOk: function () {
+                    var that = this;
+                    if ((this.PatientInfo.name == ""
+                            || this.PatientInfo.age == ""
+                            || this.PatientInfo.sex == ""
+                            || this.PatientInfo.phone == ""
+                            || this.PatientInfo.departmentNo == ""
+                            || this.PatientInfo.diagnosisTypeNo == ""
+                            || this.PatientInfo.date == "")
+                        || (this.bedRoom.bedRoomName != ""
+                            && this.sickBed.sickBedNo == "")) {
+                        this.$message({
+                            message: '请完善信息再提交',
+                            center: true,
+                            type: 'warning'
+                        });
+                        return;
+                    }
+                    if (this.bedRoom.bedRoomName != ""
+                        && this.sickBed.sickBedNo != "") {
+                        this.PatientInfo.bedNumber = this.bedRoom.bedRoomName + "-" + this.sickBed.sickBedNo
+                    }
+                    $.ajax({
+                        url: this.localhost + "/doctor/insPatientInfo",
+                        type: "post",
+                        data: this.PatientInfo,
+                        success: function (res) {
+                            that.isLoading = false
+                            if (res.flag) {
+                                that.$message({
+                                    message: '添加成功',
+                                    center: true,
+                                    type: 'success'
+                                });
+                                that.getPatients();
+                            } else {
+                                that.$message({
+                                    message: '添加失败',
+                                    center: true,
+                                    type: 'error'
+                                });
+                            }
+                        }
+                    })
+                    this.PatientInfoAdddialogFormVisible = false;
+                },
+                addPatientInfoCancel: function () {
+                    this.PatientInfoAdddialogFormVisible = false;
+                },
+
+                getPatientPTargets: function (pid) {
+                    var that = this;
+                    $.ajax({
+                        url: this.localhost + "/doctor/findAllPatientPTargetsByPid",
+                        type: "post",
+                        data: {
+                            patientId: pid
+                        },
+                        success: function (res) {
+                            that.patientPTargets = res.patientPTargets
+                            that.Atotal = that.patientPTargets.length
+                            that.isLoading = false
+                        }
+                    })
+                },
+                getPatientTargets: function () {
+                    var that = this;
+                    $.ajax({
+                        url: this.localhost + "/doctor/findAllPatientTargets",
+                        type: "post",
+                        data: {},
+                        success: function (res) {
+                            that.patientTargets = res.patientTargets
+                            that.isLoading = false
+                        }
+                    })
+
+                },
+                current_changeA: function (currentPage) {
+                    this.AcurrentPage = currentPage;
+                },
+                addPatientPTarget: function (PatientInfo) {
+                    this.patientPTarget = {
+                        patientId: PatientInfo.id,
+                        pTargetNo: "",
+                        recordTime: "",
+                        status:0,
+                        value: "",
+                        unit: ""
+                    };
+                    this.getPatientTargets();
+                    this.PatientPTargetAdddialogFormVisible = true;
+                },
+                addPatientPTargetOk: function () {
+                    var that = this;
+                    if (this.patientPTarget.patientId == ""
+                        || this.patientPTarget.pTargetNo == ""
+                        || this.patientPTarget.recordTime == "") {
+                        this.$message({
+                            message: '请完善信息再提交',
+                            center: true,
+                            type: 'warning'
+                        });
+                        return;
+                    }
+
+                    $.ajax({
+                        url: this.localhost + "/doctor/insPatientPTarget",
+                        type: "post",
+                        data: this.patientPTarget,
+                        success: function (res) {
+                            that.isLoading = false
+                            if (res.flag) {
+                                that.$message({
+                                    message: '添加成功',
+                                    center: true,
+                                    type: 'success'
+                                });
+                                that.getPatientPTarget();
+                            } else {
+                                that.$message({
+                                    message: '添加失败',
+                                    center: true,
+                                    type: 'error'
+                                });
+                            }
+                        }
+                    })
+                    this.PatientPTargetAdddialogFormVisible = false;
+                },
+                addPatientPTargetCancel: function () {
+                    this.PatientPTargetAdddialogFormVisible = false;
+                },
+                lookPatientPTarget: function (patientInfo) {
+                    this.patientPTargets = []
+                    this.getPatientPTargets(patientInfo.id)
+                    this.PatientPTargetLookdialogFormVisible = true;
+                },
+                lookPatientPTargetOk: function () {
+                    this.PatientPTargetLookdialogFormVisible = false;
+                },
+
+                getReportCardByPid:function (id){
+                    var that = this;
+                    $.ajax({
+                        url: this.localhost + "/doctor/findReportCardInfoByPId",
+                        type: "post",
+                        data: {id: id},
+                        success: function (res) {
+                            if(res.reportCard.patientinfo.diagnosisTypes==null||res.reportCard.patientinfo.department==null){
+                                that.$alert('该病人数据未完善，不能生成报卡', '生成报卡失败', {
+                                    confirmButtonText: '确定',
+                                    callback: action => {
+
+                                    }
+                                });
+                                this.reportCardDialogFormVisible=false
+                                return
+                            }
+                            that.reportCard = res.reportCard
+                            that.reportCardDialogFormVisible = true;
+                        },
+                        error:function (res){
+                            this.$alert('该病人数据未完善，不能生成报卡', '生成报卡失败', {
+                                confirmButtonText: '确定',
+                                callback: action => {
+
+                                }
+                            });
+                            that.reportCardDialogFormVisible=false
+                            return
+                        }
+                    })
+                },
+                creatReportCard: function (row) {
+                    this.reportCard={
+                        courseAnalysis:"",
+                        warnStatus:1,
+                        cstatus:0,
+                        isOperation:0,
+                        isLeaveHospital:0,
+                        isCheckedPathogen:0,
+                        isInvade:0,
+                        patientinfo: {
+                            name:"",
+                            department: {
+                                departmentName:""
+                            },
+                            diagnosisTypes:[
+                                {
+                                    diagnosisTypeName:""
+                                }
+                            ]
+                        },
+                        isMultiMedical:0,
+                        isUseMedical:0,
+                        tisNormal:0,
+
+                    }
+                    this.getReportCardByPid(row.id)
+
+                },
+                creatReportCardCancel: function () {
+                    this.reportCardDialogFormVisible=false
+                },
+                creatReportCardOk: function () {
+                    var that = this;
+                    console.log()
+                    $.ajax({
+                        url: this.localhost + "/doctor/createReportCard",
+                        type: "post",
+                        dataType:'json',
+                        contentType:'application/json;charset=UTF-8',
+                        data:JSON.stringify(this.reportCard),
+                        success: function (res) {
+                            var flag= res.flag
+                            if(flag){
+                                that.$message({
+                                    message: '提交成功',
+                                    center: true,
+                                    type: 'success'
+                                });
+                                that.reportCardDialogFormVisible=false
+                            }else {
+                                that.$message({
+                                    message: '提交失败，请稍后再试',
+                                    center: true,
+                                    type: 'success'
+                                });
+                            }
+                        }
+                    })
+                }
+            },
+            created: function () {
+                Date.prototype.format = function (format) {
+                    var o = {
+                        "M+": this.getMonth() + 1, //month
+                        "d+": this.getDate(), //day
+                        "h+": this.getHours(), //hour
+                        "m+": this.getMinutes(), //minute
+                        "s+": this.getSeconds(), //second
+                        "q+": Math.floor((this.getMonth() + 3) / 3), //quarter
+                        "S": this.getMilliseconds() //millisecond
+                    }
+                    if (/(y+)/.test(format)) {
+                        format = format.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+                    }
+                    for (var k in o) {
+                        if (new RegExp("(" + k + ")").test(format)) {
+                            format = format.replace(RegExp.$1, RegExp.$1.length == 1 ? o[k] : ("00" + o[k]).substr(("" + o[k]).length));
+                        }
+                    }
+                    return format;
+                }
+                this.nowDate = new Date().format("yyyy年MM月dd日 hh:mm:ss")
+                this.getPatients()
+                var that=this
+                $.ajax({
+                    url: this.localhost + "/user/getUser",
+                    type: "post",
+                    data: {},
+                    success: function (res) {
+                        that.user = res.user
+                        $(".username-show").text(that.user.name)
+                    }
+                })
+            }
+        })
+    })
+
+</script>
+</body>
+</html>

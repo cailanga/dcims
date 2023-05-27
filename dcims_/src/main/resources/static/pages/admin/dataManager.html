@@ -1,0 +1,1962 @@
+<!doctype html>
+<html class="no-js" lang="zxx">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>医院感染信息监测系统 </title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Place favicon.ico in the root Internist, General Practitonery -->
+
+    <!-- CSS here -->
+    <link rel="stylesheet" href="../../css/bootstrap.min.css">
+    <link rel="stylesheet" href="../../css/animate.min.css">
+    <link rel="stylesheet" href="../../css/magnific-popup.css">
+    <link rel="stylesheet" href="../../fontawesome/css/all.min.css">
+    <link rel="stylesheet" href="../../css/dripicons.css">
+    <link rel="stylesheet" href="../../css/slick.css">
+    <link rel="stylesheet" href="../../css/default.css">
+    <link rel="stylesheet" href="../../css/meanmenu.css">
+    <link rel="stylesheet" href="../../css/style.css">
+
+
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <script src="/js/jquery-3.3.1.min.js"></script>
+    <script src="/js/vue.min.js"></script>
+    <script src="/js/axios.js"></script>
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+
+
+    <link rel="stylesheet" href="../../css/responsive.css">
+    <style type="text/css">
+        .user {
+            display: inline;
+        }
+
+        .patient {
+            width: 350px;
+            /* height: 400px; */
+            background-color: #D9E6F5;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /*动画加载*/
+        .loading {
+            position: fixed;
+            left: 0;
+            top: 0;
+            /*background: url('/img/three-dots.svg') center center no-repeat #fff;*/
+            background-color: white;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1000;
+            /*opacity: 0.8;*/
+        }
+
+        .main {
+            height: 100px;
+            width: 100px;
+            margin: 200px auto
+        }
+
+        .main div {
+            color: #799761;
+            margin: 50px auto;
+        }
+
+        svg {
+            fill: none
+        }
+
+        .load {
+            stroke-width: 15px;
+            stroke-dasharray: 252;
+            stroke-dashoffset: 0;
+            animation: load 1.5s ease-in-out infinite;
+            transform-origin: center center
+
+        }
+
+        .one {
+            stroke: #b8d8d7;
+        }
+
+        .two {
+            stroke: #73c0b0;
+            animation-delay: 0.1s;
+        }
+
+        .three {
+            stroke: #4d8f8e;
+            animation-delay: 0.2s
+        }
+
+        @keyframes load {
+            0%, 100% {
+                stroke-dashoffset: 252
+            }
+            50% {
+                stroke-dashoffset: 230
+            }
+            100% {
+                transform: rotate(360deg)
+            }
+        }
+
+        .jump {
+            animation: jump 0.5s ease-in-out infinite
+        }
+
+        .first {
+            fill: #b8d8d7;
+        }
+
+        .second {
+            fill: #73c0b0;
+            animation-delay: 0.1s;
+        }
+
+        .third {
+            fill: #4d8f8e;
+            animation-delay: 0.2s;
+        }
+
+        @keyframes jump {
+            0%, 100% {
+                transform: translateY(0)
+            }
+            50% {
+                transform: translateY(-10px)
+            }
+        }
+
+        .el-dialog {
+            width: 30%;
+        }
+
+        .el-dialog__header {
+            text-align: center;
+        }
+
+        .dialog-footer {
+            text-align: center;
+        }
+
+        .pt-120 {
+            padding-top: 50px;
+        }
+
+        .second-menu .main-menu ul li:nth-child(3) {
+            border-bottom: #0b3e6f 3px solid;
+        }
+    </style>
+
+</head>
+<body>
+<!-- header -->
+<div class="headerpage_m"></div>
+<!-- header-end -->
+<!-- main-area -->
+<main id="dcims">
+    <!-- breadcrumb-area -->
+    <section class="breadcrumb-area d-flex align-items-center" style="background-color: #82A2C2;min-height: 100px">
+        <div class="container">
+            <div class="row">
+                <div class="col-xl-6 offset-xl-3 col-lg-8 offset-lg-2">
+                    <div class="breadcrumb-wrap text-center">
+                        <div class="breadcrumb-title mb-30">
+                            <h2>数据管理</h2>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="shop-area pt-120 pb-120 p-relative wow fadeInUp animated" data-animation="fadeInUp animated"
+             data-delay=".2s">
+        <div v-if="isLoading" class="loading">
+            <div class="main">
+                <svg viewBox="0 0 120 120">
+                    <circle class="load one" cx="60" cy="60" r="40"></circle>
+                    <circle class="load two" cx="60" cy="60" r="40"></circle>
+                    <circle class="load three" cx="60" cy="60" r="40"></circle>
+                    <circle class="jump first" cx="45" cy="60" r="5"></circle>
+                    <circle class="jump second" cx="60" cy="60" r="5"></circle>
+                    <circle class="jump third" cx="75" cy="60" r="5"></circle>
+                </svg>
+            </div>
+        </div>
+        <div class="container">
+
+            <el-tabs type="border-card" @tab-click="test">
+
+                <el-tab-pane label="医生信息管理">
+                    <div style="margin: 5px">
+                        <button @click="addDoctor">添加医生信息</button>
+                    </div>
+                    <el-table
+                            border
+                            :data="doctors.slice((currentPage-1)*pagesize,currentPage*pagesize)"
+                            stripe
+                            style="width: 100%">
+                        <el-table-column
+                                show-overflow-tooltip
+                                prop="username"
+                                label="用户名"
+                        >
+                        </el-table-column>
+                        <el-table-column
+                                show-overflow-tooltip
+                                prop="doctorName"
+                                label="姓名"
+                        >
+                        </el-table-column>
+                        <el-table-column
+                                prop="age"
+                                label="年龄"
+                        >
+                        </el-table-column>
+                        <el-table-column
+                                show-overflow-tooltip
+                                prop="sex"
+                                label="性别"
+                        >
+                        </el-table-column>
+                        <el-table-column
+                                show-overflow-tooltip
+                                prop="phone"
+                                label="手机号"
+                        >
+                        </el-table-column>
+                        <el-table-column label="操作">
+                            <template slot-scope="scope">
+                                <el-button
+                                        size="medium "
+                                        type="primary"
+                                        @click="updDoctor(scope.row)">修改
+                                </el-button>
+                                <el-button
+                                        size="medium "
+                                        type="primary"
+                                        @click="delDoctor(scope.row)">删除
+                                </el-button>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                </el-tab-pane>
+                <el-tab-pane label="诊断类型管理">
+                    <div style="margin: 5px">
+                        <button @click="addDiagnosisType">添加信息</button>
+                    </div>
+                    <el-table
+                            border
+                            :data="diagnosisTypes.slice((currentPage-1)*pagesize,currentPage*pagesize)"
+                            stripe
+                            style="width: 100%">
+                        <el-table-column
+                                prop="diagnosisTypeNo"
+                                label="诊断类型编号"
+                        >
+                        </el-table-column>
+                        <el-table-column
+                                prop="diagnosisTypeName"
+                                label="诊断类型名称"
+                        >
+                        </el-table-column>
+                        <el-table-column label="操作">
+                            <template slot-scope="scope">
+                                <el-button
+                                        size="medium "
+                                        type="primary"
+                                        @click="updDiagnosisType(scope.row)">修改
+                                </el-button>
+                                </el-button>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                </el-tab-pane>
+                <el-tab-pane label="病房管理">
+                    <div style="margin: 5px">
+                        <button @click="addBedRoom">添加信息</button>
+                    </div>
+                    <el-table
+                            border
+                            :data="bedRooms.slice((currentPage-1)*pagesize,currentPage*pagesize)"
+                            stripe
+                            style="width: 100%">
+                        <el-table-column
+                                prop="bedRoomName"
+                                label="病房编号"
+                        >
+                        </el-table-column>
+                        <el-table-column
+                                prop="department.departmentName"
+                                label="所属科室"
+                        >
+                        </el-table-column>
+                        <el-table-column
+                                prop="bedCount"
+                                label="病床数量"
+                        >
+                        </el-table-column>
+                        <el-table-column label="操作">
+                            <template slot-scope="scope">
+                                <el-button
+                                        size="medium "
+                                        type="primary"
+                                        @click="updBedRoom(scope.row)">修改
+                                </el-button>
+                                <el-button
+                                        size="medium "
+                                        type="primary"
+                                        @click="lookBedRoomCount(scope.row)">查看病床
+                                </el-button>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                </el-tab-pane>
+                <el-tab-pane label="感染检测管理">
+                    <div style="margin: 5px">
+                        <button @click="addInfectionType">添加信息</button>
+                    </div>
+                    <el-table
+                            border
+                            :data="infectionTypes.slice((currentPage-1)*pagesize,currentPage*pagesize)"
+                            stripe
+                            style="width: 100%">
+                        <el-table-column
+                                prop="infectionTypeNo"
+                                label="感染检测类型编号"
+                        >
+                        </el-table-column>
+                        <el-table-column
+                                prop="infectionTypeName"
+                                label="感染检测类型名称"
+                        >
+                        </el-table-column>
+                        <el-table-column label="操作">
+                            <template slot-scope="scope">
+                                <el-button
+                                        size="medium "
+                                        type="primary"
+                                        @click="updInfectionType(scope.row)">修改
+                                </el-button>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                </el-tab-pane>
+                <el-tab-pane label="爆发类型管理">
+                    <div style="margin: 5px">
+                        <button @click="addOutbreakType">添加信息</button>
+                    </div>
+                    <el-table
+                            border
+                            :data="outbreakTypes.slice((currentPage-1)*pagesize,currentPage*pagesize)"
+                            stripe
+                            style="width: 100%">
+                        <el-table-column
+                                prop="outBreakTypeNo"
+                                label="爆发类型编号"
+                        >
+                        </el-table-column>
+                        <el-table-column
+                                prop="outBreakTypeName"
+                                label="爆发类型名称"
+                        >
+                        </el-table-column>
+                        <el-table-column label="操作">
+                            <template slot-scope="scope">
+                                <el-button
+                                        size="medium "
+                                        type="primary"
+                                        @click="updOutbreakType(scope.row)">修改
+                                </el-button>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                </el-tab-pane>
+                <el-tab-pane label="检查指标管理">
+                    <div style="margin: 5px">
+                        <button @click="addCheckType">添加信息</button>
+                    </div>
+                    <el-table
+                            border
+                            :data="CheckTypes.slice((currentPage-1)*pagesize,currentPage*pagesize)"
+                            stripe
+                            style="width: 100%">
+                        <el-table-column
+                                prop="checkTypeNo"
+                                label="检测类型编号"
+                        >
+                        </el-table-column>
+                        <el-table-column
+                                prop="checkTypeName"
+                                label="检测类型名称"
+                        >
+                        </el-table-column>
+                        <el-table-column label="操作">
+                            <template slot-scope="scope">
+                                <el-button
+                                        size="medium "
+                                        type="primary"
+                                        @click="updCheckType(scope.row)">修改
+                                </el-button>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                </el-tab-pane>
+                <el-tab-pane label="科室管理">
+                    <div style="margin: 5px">
+                        <button @click="addDepartment">添加信息</button>
+                    </div>
+                    <el-table
+                            border
+                            :data="Departments.slice((currentPage-1)*pagesize,currentPage*pagesize)"
+                            stripe
+                            style="width: 100%">
+                        <el-table-column
+                                prop="departmentNo"
+                                label="爆发类型编号"
+                        >
+                        </el-table-column>
+                        <el-table-column
+                                prop="departmentName"
+                                label="爆发类型名称"
+                        >
+                        </el-table-column>
+                        <el-table-column label="操作">
+                            <template slot-scope="scope">
+                                <el-button
+                                        size="medium "
+                                        type="primary"
+                                        @click="updDepartment(scope.row)">修改
+                                </el-button>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                </el-tab-pane>
+            </el-tabs>
+
+            <!-- 分页信息 -->
+            <div class="pagination-wrap mt-50 text-center">
+                <div style="text-align: center;margin-top: 30px;">
+                    <el-pagination
+                            :page-size="pagesize"
+                            background
+                            layout="prev, pager, next"
+                            :total="total"
+                            @current-change="current_change">
+                    </el-pagination>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    </section>-->
+    <el-dialog title="添加医生信息" :show-close="false" :visible.sync="DoctorAddDialogFormVisible">
+        <el-form :model="doctor">
+            <el-form-item label="用户名" :label-width="formLabelWidth">
+                <el-input placeholder="请输入用户名" v-model="doctor.username" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="姓名" :label-width="formLabelWidth">
+                <el-input placeholder="请输入姓名" v-model="doctor.doctorName" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="年龄" :label-width="formLabelWidth">
+                <el-input placeholder="请输入年龄" v-model="doctor.age" auto-complete="off" type="number"></el-input>
+            </el-form-item>
+            <el-form-item label="性别" :label-width="formLabelWidth">
+                <el-select v-model="doctor.sex" placeholder="请选择">
+                    <el-option
+                            key="男"
+                            label="男"
+                            value="男">
+                    </el-option>
+                    <el-option
+                            key="女"
+                            label="女"
+                            value="女">
+                    </el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="手机号" :label-width="formLabelWidth">
+                <el-input placeholder="请输入手机号" type="number" v-model="doctor.phone" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="密码" :label-width="formLabelWidth">
+                <el-input placeholder="请输入密码" v-model="doctor.password" auto-complete="off" show-password></el-input>
+            </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="DoctorAddCancel">取 消</el-button>
+            <el-button type="primary" @click="DoctorAddOk">确 定</el-button>
+        </div>
+    </el-dialog>
+    <el-dialog title="修改医生信息" :show-close="false" :visible.sync="DoctorUpdDialogFormVisible">
+        <el-form :model="doctor">
+            <el-form-item label="用户名" :label-width="formLabelWidth">
+                <el-input :disabled="true" placeholder="请输入用户名" v-model="doctor.username"
+                          auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="姓名" :label-width="formLabelWidth">
+                <el-input placeholder="请输入姓名" v-model="doctor.doctorName" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="年龄" :label-width="formLabelWidth">
+                <el-input placeholder="请输入年龄" v-model="doctor.age" auto-complete="off" type="number"></el-input>
+            </el-form-item>
+            <el-form-item label="性别" :label-width="formLabelWidth">
+                <el-select v-model="doctor.sex" placeholder="请选择">
+                    <el-option
+                            key="男"
+                            label="男"
+                            value="男">
+                    </el-option>
+                    <el-option
+                            key="女"
+                            label="女"
+                            value="女">
+                    </el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="手机号" :label-width="formLabelWidth">
+                <el-input placeholder="请输入手机号" type="number" v-model="doctor.phone" auto-complete="off"></el-input>
+            </el-form-item>
+            <!-- <el-form-item label="密码" :label-width="formLabelWidth">
+                 <el-input placeholder="请输入密码" v-model="doctor.password" auto-complete="off" show-password></el-input>
+             </el-form-item>-->
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="DoctorUpdCancel">取 消</el-button>
+            <el-button type="primary" @click="DoctorUpdOk">确 定</el-button>
+        </div>
+    </el-dialog>
+
+    <el-dialog title="添加诊断信息" :show-close="false" :visible.sync="DiagnosisTypeAddDialogFormVisible">
+        <el-form :model="diagnosisType">
+            <el-form-item label="诊断类型名称" :label-width="formLabelWidth">
+                <el-input placeholder="请输入诊断类型名称" v-model="diagnosisType.diagnosisTypeName"
+                          auto-complete="off"></el-input>
+            </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="DiagnosisTypeAddCancel">取 消</el-button>
+            <el-button type="primary" @click="DiagnosisTypeAddOk">确 定</el-button>
+        </div>
+    </el-dialog>
+    <el-dialog title="修改诊断信息" :show-close="false" :visible.sync="DiagnosisTypeUpdDialogFormVisible">
+        <el-form :model="diagnosisType">
+            <el-form-item label="诊断信息名称" :label-width="formLabelWidth">
+                <el-input placeholder="请输入诊断信息名称" v-model="diagnosisType.diagnosisTypeName"
+                          auto-complete="off"></el-input>
+            </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="DiagnosisTypeUpdCancel">取 消</el-button>
+            <el-button type="primary" @click="DiagnosisTypeUpdOk">确 定</el-button>
+        </div>
+    </el-dialog>
+
+    <el-dialog title="添加病房信息" :show-close="false" :visible.sync="BedRoomAddDialogFormVisible">
+        <el-form :model="bedRoom">
+            <el-form-item label="病房号" :label-width="formLabelWidth">
+                <el-input placeholder="请输入病房号（比如101）" v-model="bedRoom.bedRoomName"
+                          auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="所属科室" :label-width="formLabelWidth">
+                <select class="form-horizontal" v-model="bedRoom.departmentNo">
+                    <option :value="item.departmentNo" v-for="item in departments">{{item.departmentName}}</option>
+                </select>
+            </el-form-item>
+            <el-form-item label="病床数量" :label-width="formLabelWidth">
+                <el-input placeholder="请输入病床数量" v-model="bedRoom.bedCount" type="number"
+                          auto-complete="off">
+                </el-input>
+            </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="BedRoomAddCancel">取 消</el-button>
+            <el-button type="primary" @click="BedRoomAddOk">确 定</el-button>
+        </div>
+    </el-dialog>
+    <el-dialog title="修改病房信息" :show-close="false" :visible.sync="BedRoomUpdDialogFormVisible">
+        <el-form :model="bedRoom">
+            <
+            <el-form-item label="病房号" :label-width="formLabelWidth">
+                <el-input v-model="bedRoom.bedRoomName"
+                          auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="所属科室" :label-width="formLabelWidth">
+                <select class="form-horizontal" v-model="bedRoom.departmentNo">
+                    <option :value="item.departmentNo" v-for="item in departments">{{item.departmentName}}</option>
+                </select>
+            </el-form-item>
+            <el-form-item label="病床数量" :label-width="formLabelWidth">
+                <el-input v-model="bedRoom.bedCount" type="number"
+                          auto-complete="off">
+                </el-input>
+            </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="BedRoomUpdCancel">取 消</el-button>
+            <el-button type="primary" @click="BedRoomUpdOk">确 定</el-button>
+        </div>
+    </el-dialog>
+    <el-dialog title="查看病床信息" :show-close="false" :visible.sync="SickBedLookDialogFormVisible">
+        <el-table
+                border
+                :data="sickBeds.slice((currentPage-1)*pagesize,currentPage*pagesize)"
+                stripe
+                style="width: 100%">
+            <el-table-column
+                    prop="bedRoomName"
+                    label="病房号"
+            >
+            </el-table-column>
+            <el-table-column
+                    prop="sickBedNo"
+                    label="病床编号"
+            >
+            </el-table-column>
+            <el-table-column
+                    prop="sickBedStr"
+                    label="病床号"
+            >
+            </el-table-column>
+            <el-table-column
+                    label="居住情况"
+            >
+                <template slot-scope="scope">
+                    <el-button
+                            v-if="scope.row.role==0"
+                            size="medium "
+                            type="primary"
+                    >审核
+                    </el-button>
+                    <span v-if="scope.row.pid==0">无人</span>
+                    <span v-else>有人</span>
+                </template>
+            </el-table-column>
+        </el-table>
+        <div slot="footer" class="dialog-footer">
+            <el-button type="primary" @click="lookBedRoomCountOk">确 定</el-button>
+        </div>
+    </el-dialog>
+
+    <el-dialog title="添加感染检测类型" :show-close="false" :visible.sync="InfectionTypeAddDialogFormVisible">
+        <el-form :model="infectionType">
+            <el-form-item label="感染检测名称" :label-width="formLabelWidth">
+                <el-input placeholder="请输入感染检测名称" v-model="infectionType.infectionTypeName"
+                          auto-complete="off"></el-input>
+            </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="InfectionTypeAddCancel">取 消</el-button>
+            <el-button type="primary" @click="InfectionTypeAddOk">确 定</el-button>
+        </div>
+    </el-dialog>
+    <el-dialog title="修改感染检测信息" :show-close="false" :visible.sync="InfectionTypeUpdDialogFormVisible">
+        <el-form :model="infectionType">
+            <el-form-item label="感染检测名称" :label-width="formLabelWidth">
+                <el-input placeholder="请输入感染检测名称" v-model="infectionType.infectionTypeName"
+                          auto-complete="off"></el-input>
+            </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="InfectionTypeUpdCancel">取 消</el-button>
+            <el-button type="primary" @click="InfectionTypeUpdOk">确 定</el-button>
+        </div>
+    </el-dialog>
+
+    <el-dialog title="添加爆发类型" :show-close="false" :visible.sync="OutbreakTypeAddDialogFormVisible">
+        <el-form :model="outBreakType">
+            <el-form-item label="爆发类型名称" :label-width="formLabelWidth">
+                <el-input placeholder="请输入爆发类型名称" v-model="outBreakType.outBreakTypeName"
+                          auto-complete="off"></el-input>
+            </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="OutbreakTypeAddCancel">取 消</el-button>
+            <el-button type="primary" @click="OutbreakTypeAddOk">确 定</el-button>
+        </div>
+    </el-dialog>
+    <el-dialog title="修改爆发类型信息" :show-close="false" :visible.sync="OutbreakTypeUpdDialogFormVisible">
+        <el-form :model="outBreakType">
+            <el-form-item label="爆发类型名称" :label-width="formLabelWidth">
+                <el-input placeholder="请输入爆发类型名称" v-model="outBreakType.outBreakTypeName"
+                          auto-complete="off"></el-input>
+            </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="OutbreakTypeUpdCancel">取 消</el-button>
+            <el-button type="primary" @click="OutbreakTypeUpdOk">确 定</el-button>
+        </div>
+    </el-dialog>
+
+    <el-dialog title="添加检测类型" :show-close="false" :visible.sync="CheckTypeAddDialogFormVisible">
+        <el-form :model="CheckType">
+            <el-form-item label="检测指标名称" :label-width="formLabelWidth">
+                <el-input placeholder="请输入检测指标名称" v-model="CheckType.checkTypeName"
+                          auto-complete="off"></el-input>
+            </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="CheckTypeAddCancel">取 消</el-button>
+            <el-button type="primary" @click="CheckTypeAddOk">确 定</el-button>
+        </div>
+    </el-dialog>
+    <el-dialog title="修改检测类型信息" :show-close="false" :visible.sync="CheckTypeUpdDialogFormVisible">
+        <el-form :model="CheckType">
+            <el-form-item label="检测指标名称" :label-width="formLabelWidth">
+                <el-input placeholder="请输入检测指标名称" v-model="CheckType.checkTypeName"
+                          auto-complete="off"></el-input>
+            </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="CheckTypeUpdCancel">取 消</el-button>
+            <el-button type="primary" @click="CheckTypeUpdOk">确 定</el-button>
+        </div>
+    </el-dialog>
+
+    <el-dialog title="添加科室信息" :show-close="false" :visible.sync="DepartmentAddDialogFormVisible">
+        <el-form :model="Department">
+            <el-form-item label="科室名称" :label-width="formLabelWidth">
+                <el-input placeholder="请输入科室名称" v-model="Department.departmentName"
+                          auto-complete="off"></el-input>
+            </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="DepartmentAddCancel">取 消</el-button>
+            <el-button type="primary" @click="DepartmentAddOk">确 定</el-button>
+        </div>
+    </el-dialog>
+    <el-dialog title="修改科室信息" :show-close="false" :visible.sync="DepartmentUpdDialogFormVisible">
+        <el-form :model="Department">
+            <el-form-item label="科室名称" :label-width="formLabelWidth">
+                <el-input placeholder="请输入科室名称" v-model="Department.departmentName"
+                          auto-complete="off"></el-input>
+            </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="DepartmentUpdCancel">取 消</el-button>
+            <el-button type="primary" @click="DepartmentUpdOk">确 定</el-button>
+        </div>
+    </el-dialog>
+
+    <!-- shop-area-end -->
+    <!-- shop-area-end -->
+</main>
+<!-- main-area-end -->
+<!-- footer -->
+
+<!-- footer-end -->
+<div class="footerpage_m"></div>
+
+<!-- JS here -->
+<!-- JS here -->
+<script src="../../js/vendor/modernizr-3.5.0.min.js"></script>
+<script src="../../js/vendor/jquery-1.12.4.min.js"></script>
+<script src="../../js/popper.min.js"></script>
+<script src="../../js/bootstrap.min.js"></script>
+<script src="../../js/one-page-nav-min.js"></script>
+<script src="../../js/jquery.meanmenu.min.js"></script>
+<script src="../../js/slick.min.js"></script>
+<script src="../../js/ajax-form.js"></script>
+<script src="../../js/paroller.js"></script>
+<script src="../../js/wow.min.js"></script>
+<script src="../../js/js_isotope.pkgd.min.js"></script>
+<script src="../../js/imagesloaded.min.js"></script>
+<script src="../../js/parallax.min.js"></script>
+<script src="../../js/jquery.waypoints.min.js"></script>
+<script src="../../js/jquery.counterup.min.js"></script>
+<script src="../../js/jquery.scrollUp.min.js"></script>
+<script src="../../js/parallax-scroll.js"></script>
+<script src="../../js/jquery.magnific-popup.min.js"></script>
+<script src="../../js/element-in-view.js"></script>
+<script src="../../js/main.js"></script>
+<script>
+    $(function () {
+        //调用公共代码
+        $('.footerpage_m').load('/commons/footer.html');
+        $('.headerpage_m').load('/commons/header.html');
+
+        $(".exit").click(function logout() {
+            $.ajax({
+                type: "post",
+                url: "/logout",
+                dataType: "json",
+                data: {},
+                success: function (res) {
+                    if (res.code == 200) {
+                        window.location.href = "http://192.168.150.130:8089/pages/login.html";
+                    } else {
+                        alert("退出失败")
+                    }
+                }
+            })
+        })
+
+        new Vue({
+            el: "#dcims",
+            data: {
+                localhost: "http://192.168.150.130:8089",
+                total: 0,
+                pagesize: 4,
+                currentPage: 1,
+                departments: [],
+                doctors: [],
+                DoctorUpdDialogFormVisible: false,
+                DoctorAddDialogFormVisible: false,
+                DiagnosisTypeUpdDialogFormVisible: false,
+                DiagnosisTypeAddDialogFormVisible: false,
+                BedRoomUpdDialogFormVisible: false,
+                BedRoomAddDialogFormVisible: false,
+                SickBedLookDialogFormVisible: false,
+                InfectionTypeUpdDialogFormVisible: false,
+                InfectionTypeAddDialogFormVisible: false,
+                OutbreakTypeUpdDialogFormVisible: false,
+                OutbreakTypeAddDialogFormVisible: false,
+                CheckTypeUpdDialogFormVisible: false,
+                CheckTypeAddDialogFormVisible: false,
+                DepartmentUpdDialogFormVisible: false,
+                DepartmentAddDialogFormVisible: false,
+                doctor: {
+                    username: "",
+                    doctorName: "",
+                    age: "",
+                    sex: "男",
+                    phone: "",
+                    password: "",
+                    lastUsername: "",
+                },
+                diagnosisTypes: [],
+                diagnosisType: {
+                    diagnosisTypeName: ""
+                },
+                bedRooms: [],
+                bedRoom: {
+                    bedRoomName: "",
+                    departmentNo: "",
+                    bedCount: 4
+                },
+                sickBeds: [],
+                infectionTypes: [],
+                infectionType: {infectionTypeNo: "", infectionTypeName: ""},
+                outbreakTypes: [],
+                outBreakType: {
+                    id: "",
+                    outBreakTypeNo: "",
+                    outBreakTypeName: ""
+                },
+                CheckTypes: [],
+                CheckType: {
+                    checkTypeNo: "",
+                    checkTypeName: ""
+                },
+                Departments: [],
+                Department: {
+                    departmentNo: "",
+                    departmentName: ""
+                },
+                lastUsername: "",
+                formLabelWidth: "120px",
+                user: {},
+                nowDate: "",
+                isLoading: true,
+                dialogFormVisible: false
+            },
+            methods: {
+                /**
+                 * 验证电话号码，带"(,),-"字符和数字其他不通过
+                 *
+                 * @param str
+                 * @returns {Boolean}
+                 */
+                checkPhone: function (str) {
+                    if (str.length > 20) {
+                        return false;
+                    }
+                    var patternStr = "(0123456789-)";
+                    var strlength = str.length;
+                    for (var i = 0; i < strlength; i++) {
+                        var tempchar = str.substring(i, i + 1);
+                        if (patternStr.indexOf(tempchar) < 0) {
+                            return false;
+                        }
+                    }
+                    return true;
+                },
+                checkEmail: function (emailString) {
+                    var emailbool = true;
+                    // var emailString = $("#" + id).val();
+                    var regEmail = /^\w+((-\w+)|(\.\w+))*\@[A-Za-z0-9]+((\.|-)[A-Za-z0-9]+)*\.[A-Za-z0-9]+$/;
+                    if ($.trim(emailString).length > 0) {
+                        if (!regEmail.test(emailString)) {
+                            emailbool = false;
+                        }
+                    }
+                    return emailbool;
+                },
+                test: function (data) {
+                    this.total = 0;
+                    this.currentPage = 1
+                    var index = data.index;
+                    if (index == 0) {
+                        this.getDoctors()
+                    } else if (index == 1) {
+                        this.getDiagnosisTypes()
+                    } else if (index == 2) {
+                        this.getBedRooms()
+                    } else if (index == 3) {
+                        this.getInfectionTypes()
+                    } else if (index == 4) {
+                        this.getOutbreakTypes()
+                    } else if (index == 5) {
+                        this.getCheckTypes()
+                    } else if (index == 6) {
+                        this.getDepartments()
+                    }
+                },
+                delDoctor: function (item) {
+                    var that = this
+                    $.ajax({
+                        url: this.localhost + "/admin/delDoctor",
+                        type: "post",
+                        data: item,
+                        success: function (res) {
+                            if (res.flag) {
+                                that.$message({
+                                    message: '删除成功',
+                                    center: true,
+                                    type: 'success'
+                                });
+                                that.getDoctors()
+                            } else {
+                                that.$message({
+                                    message: '该医生已存在其他相关信息，不能删除',
+                                    center: true,
+                                    type: 'error'
+                                });
+                            }
+                        },
+                        error: function () {
+                            that.$message({
+                                message: '该医生已存在其他相关信息，不能删除',
+                                center: true,
+                                type: 'error'
+                            });
+                        }
+                    })
+                },
+                doctorManager: function () {
+                    this.total = 0;
+                    this.currentPage = 1
+                    this.getDoctors()
+                },
+                diagnosisTypeManager: function () {
+                    this.total = 0;
+                    this.currentPage = 1
+                    this.getDiagnosisTypes()
+                },
+                BedRoomManager: function () {
+                    this.total = 0;
+                    this.currentPage = 1
+                },
+                operationManager: function () {
+                    this.total = 0;
+                    this.currentPage = 1
+                },
+                infectionManager: function () {
+                    this.total = 0;
+                    this.currentPage = 1
+                },
+                outBreakTypeManager: function () {
+                    this.total = 0;
+                    this.currentPage = 1
+                },
+                checkTypeManager: function () {
+                    this.total = 0;
+                    this.currentPage = 1
+                },
+                getDoctors: function () {
+                    var that = this;
+                    $.ajax({
+                        url: this.localhost + "/admin/findAllDoctors",
+                        type: "post",
+                        data: {},
+                        success: function (res) {
+                            that.doctors = res.doctors
+                            that.total = that.doctors.length
+                            that.isLoading = false
+                        }
+                    })
+                }
+                ,
+                current_change: function (currentPage) {
+                    this.currentPage = currentPage;
+                }
+                ,
+                updDoctor: function (doctor) {
+                    this.lastUsername = doctor.username
+                    var doctor1 = JSON.parse(JSON.stringify(doctor));
+                    this.doctor = {
+                        username: "",
+                        doctorName: "",
+                        age: "",
+                        sex: "",
+                        phone: "",
+                        lastUsername: ""
+                    }
+                    this.doctor = doctor1;
+                    this.DoctorUpdDialogFormVisible = true
+                }
+                ,
+                addDoctor: function () {
+
+                    this.doctor = {
+                        username: "",
+                        doctorName: "",
+                        age: "",
+                        sex: "",
+                        phone: "",
+                        password: "",
+                        lastUsername: ""
+                    }
+                    this.DoctorAddDialogFormVisible = true;
+                }
+                ,
+                DoctorAddOk: function () {
+                    console.log(this.doctor)
+                    if (this.doctor.username == ""
+                        || this.doctor.doctorName == ""
+                        || this.doctor.age == ""
+                        || this.doctor.password == ""
+                        || this.doctor.phone == ""
+                        || this.doctor.sex == "") {
+                        this.$message({
+                            message: '请将信息填写完整',
+                            center: true,
+                            type: 'warning'
+                        });
+                        return
+                    }
+                    if(!this.checkEmail(this.doctor.username)){
+                        this.$message({
+                            message: '请输入邮箱格式的用户名',
+                            center: true,
+                            type: 'warning'
+                        });
+                        return;
+                    }
+                    if (!this.checkPhone(this.doctor.phone)) {
+                        this.$message({
+                            message: '请输入合法的手机号',
+                            center: true,
+                            type: 'warning'
+                        });
+                        return;
+                    }
+
+                    var that = this;
+                    $.ajax({
+                        url: this.localhost + "/admin/insDoctor",
+                        type: "post",
+                        dataType: "JSON",
+                        data: this.doctor,
+                        success: function (res) {
+                            that.isLoading = false
+                            if (res.flag) {
+                                that.$message({
+                                    message: '添加成功',
+                                    center: true,
+                                    type: 'success'
+                                });
+                                that.getDoctors()
+                            } else {
+                                that.$message({
+                                    message: '添加失败',
+                                    center: true,
+                                    type: 'error'
+                                });
+                            }
+
+                        },
+                        error:function (error){
+                            that.$message({
+                                message: '服务器错误，添加失败',
+                                center: true,
+                                type: 'error'
+                            });
+                        }
+                    })
+                    this.DoctorAddDialogFormVisible = false;
+
+                }
+                ,
+                DoctorAddCancel: function () {
+                    this.DoctorAddDialogFormVisible = false;
+                }
+                ,
+                DoctorUpdOk: function () {
+                    console.log(this.doctor)
+                    if (this.doctor.username == ""
+                        || this.doctor.doctorName == ""
+                        || this.doctor.age == ""
+                        || this.doctor.phone == ""
+                        || this.doctor.sex == "") {
+                        this.$message({
+                            message: '请将信息填写完整',
+                            center: true,
+                            type: 'success'
+                        });
+                        return
+                    }
+                    if(!this.checkEmail(this.doctor.username)){
+                        this.$message({
+                            message: '请输入邮箱格式的用户名',
+                            center: true,
+                            type: 'warning'
+                        });
+                        return;
+                    }
+                    if (!this.checkPhone(this.doctor.phone)) {
+                        this.$message({
+                            message: '请输入合法的手机号',
+                            center: true,
+                            type: 'warning'
+                        });
+                        return;
+                    }
+
+                    var that = this;
+                    this.doctor.lastUsername = this.lastUsername
+                    $.ajax({
+                        url: this.localhost + "/admin/updDoctor",
+                        type: "post",
+                        dataType: "JSON",
+                        data: this.doctor,
+                        success: function (res) {
+
+                            that.isLoading = false
+                            if (res.flag) {
+                                that.$message({
+                                    message: '信息修改成功',
+                                    center: true,
+                                    type: 'success'
+                                });
+                                that.getDoctors()
+                            } else {
+                                that.$message({
+                                    message: '信息修改失败',
+                                    center: true,
+                                    type: 'error'
+                                });
+                            }
+
+                        },
+                        error:function (error){
+                            that.$message({
+                                message: '服务器错误，修改失败',
+                                center: true,
+                                type: 'error'
+                            });
+                        }
+                    })
+                    this.DoctorUpdDialogFormVisible = false;
+
+                }
+                ,
+                DoctorUpdCancel: function () {
+                    this.DoctorUpdDialogFormVisible = false;
+                },
+                getDiagnosisTypes: function () {
+                    var that = this;
+                    $.ajax({
+                        url: this.localhost + "/admin/findAllDiagnosisTypes",
+                        type: "post",
+                        data: {},
+                        success: function (res) {
+                            that.diagnosisTypes = res.diagnosisTypes
+                            that.total = that.diagnosisTypes.length
+                            that.isLoading = false
+                        }
+                    })
+                }
+                ,
+                updDiagnosisType: function (DiagnosisType) {
+                    var DiagnosisType1 = JSON.parse(JSON.stringify(DiagnosisType));
+                    this.diagnosisType = {
+                        diagnosisTypeName: ""
+                    }
+                    this.diagnosisType = DiagnosisType1;
+                    this.DiagnosisTypeUpdDialogFormVisible = true
+                }
+                ,
+                addDiagnosisType: function () {
+
+                    this.diagnosisType = {
+                        DiagnosisTypeName: ""
+                    }
+                    this.DiagnosisTypeAddDialogFormVisible = true;
+                }
+                ,
+                DiagnosisTypeAddOk: function () {
+                    console.log(this.DiagnosisType)
+                    if (this.diagnosisType.diagnosisTypeName == "") {
+                        this.$message({
+                            message: '请将信息填写完整',
+                            center: true,
+                            type: 'warning'
+                        });
+                        return
+                    }
+                    var that = this;
+                    $.ajax({
+                        url: this.localhost + "/admin/insDiagnosisType",
+                        type: "post",
+                        dataType: "JSON",
+                        data: this.diagnosisType,
+                        success: function (res) {
+                            that.isLoading = false
+                            if (res.flag) {
+                                that.$message({
+                                    message: '添加成功',
+                                    center: true,
+                                    type: 'success'
+                                });
+                                that.getDiagnosisTypes()
+                            } else {
+                                that.$message({
+                                    message: '添加失败',
+                                    center: true,
+                                    type: 'error'
+                                });
+                            }
+
+                        }
+                    })
+                    this.DiagnosisTypeAddDialogFormVisible = false;
+
+                }
+                ,
+                DiagnosisTypeAddCancel: function () {
+                    this.DiagnosisTypeAddDialogFormVisible = false;
+                }
+                ,
+                DiagnosisTypeUpdOk: function () {
+                    console.log(this.DiagnosisType)
+                    if (this.diagnosisType.diagnosisTypeName == "") {
+                        this.$message({
+                            message: '请将信息填写完整',
+                            center: true,
+                            type: 'warning'
+                        });
+                        return
+                    }
+                    var that = this;
+                    $.ajax({
+                        url: this.localhost + "/admin/updDiagnosisType",
+                        type: "post",
+                        dataType: "JSON",
+                        data: this.diagnosisType,
+                        success: function (res) {
+
+                            that.isLoading = false
+                            if (res.flag) {
+                                that.$message({
+                                    message: '信息修改成功',
+                                    center: true,
+                                    type: 'success'
+                                });
+                                that.getDiagnosisTypes()
+                            } else {
+                                that.$message({
+                                    message: '信息修改失败',
+                                    center: true,
+                                    type: 'error'
+                                });
+                            }
+
+                        }
+                    })
+                    this.DiagnosisTypeUpdDialogFormVisible = false;
+
+                }
+                ,
+                DiagnosisTypeUpdCancel: function () {
+                    this.DiagnosisTypeUpdDialogFormVisible = false;
+                }
+                ,
+                getBedRooms: function () {
+                    var that = this;
+                    $.ajax({
+                        url: this.localhost + "/admin/findAllBedRooms",
+                        type: "post",
+                        data: {},
+                        success: function (res) {
+                            that.bedRooms = res.bedRooms
+                            that.departments = res.departments
+                            that.total = that.bedRooms.length
+                            that.isLoading = false
+                        }
+                    })
+                }
+                ,
+                updBedRoom: function (BedRoom) {
+                    var BedRoom1 = JSON.parse(JSON.stringify(BedRoom));
+                    this.bedRoom = {
+                        id: "",
+                        bedRoomName: "",
+                        departmentNo: "",
+                        bedCount: 4,
+                        lastBedRoomName: ""
+                    }
+                    this.bedRoom.id = BedRoom1.id;
+                    this.bedRoom.bedRoomName = BedRoom1.bedRoomName;
+                    this.bedRoom.departmentNo = BedRoom1.departmentNo;
+                    this.bedRoom.bedCount = BedRoom1.bedCount;
+                    this.bedRoom.lastBedRoomName = BedRoom1.bedRoomName;
+                    this.BedRoomUpdDialogFormVisible = true
+                }
+                ,
+                addBedRoom: function () {
+
+                    this.bedRoom = {
+                        bedRoomName: "",
+                        departmentNo: "",
+                        bedCount: 4
+                    }
+                    this.BedRoomAddDialogFormVisible = true;
+                }
+                ,
+                BedRoomAddOk: function () {
+                    if (this.bedRoom.bedRoomName == "" ||
+                        this.bedRoom.departmentNo == "" ||
+                        this.bedRoom.bedCount == "") {
+                        this.$message({
+                            message: '请将信息填写完整',
+                            center: true,
+                            type: 'warning'
+                        });
+                        return
+                    }
+                    var that = this;
+                    $.ajax({
+                        url: this.localhost + "/admin/insBedRoom",
+                        type: "post",
+                        dataType: "JSON",
+                        data: this.bedRoom,
+                        success: function (res) {
+                            that.isLoading = false
+                            if (res.flag) {
+                                that.$message({
+                                    message: '添加成功',
+                                    center: true,
+                                    type: 'success'
+                                });
+                                that.getBedRooms()
+                            } else {
+                                that.$message({
+                                    message: '添加失败',
+                                    center: true,
+                                    type: 'error'
+                                });
+                            }
+
+                        },
+                        error: function (res) {
+                            that.$message({
+                                message: '添加失败',
+                                center: true,
+                                type: 'error'
+                            });
+                        }
+                    })
+                    this.BedRoomAddDialogFormVisible = false;
+
+                }
+                ,
+                BedRoomAddCancel: function () {
+                    this.BedRoomAddDialogFormVisible = false;
+                }
+                ,
+                BedRoomUpdOk: function () {
+                    if (this.bedRoom.bedRoomName == "" ||
+                        this.bedRoom.departmentNo == "" ||
+                        this.bedRoom.bedCount == "") {
+                        this.$message({
+                            message: '请将信息填写完整',
+                            center: true,
+                            type: 'warning'
+                        });
+                        return
+                    }
+                    var that = this;
+                    $.ajax({
+                        url: this.localhost + "/admin/updBedRoom",
+                        type: "post",
+                        dataType: "JSON",
+                        data: this.bedRoom,
+                        success: function (res) {
+
+                            that.isLoading = false
+                            if (res.flag) {
+                                that.$message({
+                                    message: '信息修改成功',
+                                    center: true,
+                                    type: 'success'
+                                });
+                                that.getBedRooms()
+                            } else {
+                                that.$message({
+                                    message: '信息修改失败',
+                                    center: true,
+                                    type: 'error'
+                                });
+                            }
+                        },
+                        error: function (res) {
+                            that.$message({
+                                message: '修改失败',
+                                center: true,
+                                type: 'error'
+                            });
+                        }
+                    })
+                    this.BedRoomUpdDialogFormVisible = false;
+                }
+                ,
+                BedRoomUpdCancel: function () {
+                    this.BedRoomUpdDialogFormVisible = false;
+                },
+                lookBedRoomCount: function (bedRoom) {
+                    var that = this;
+                    $.ajax({
+                        url: this.localhost + "/admin/selSickBeds",
+                        type: "post",
+                        dataType: "JSON",
+                        data: {bedRoomName: bedRoom.bedRoomName},
+                        success: function (res) {
+                            that.isLoading = false
+                            that.sickBeds = res.sickBeds
+                        }
+                    })
+                    this.SickBedLookDialogFormVisible = true;
+                },
+                lookBedRoomCountOk: function () {
+                    this.SickBedLookDialogFormVisible = false;
+                },
+
+                getInfectionTypes: function () {
+                    var that = this;
+                    $.ajax({
+                        url: this.localhost + "/admin/findAllInfectionTypes",
+                        type: "post",
+                        data: {},
+                        success: function (res) {
+                            that.infectionTypes = res.infectionTypes
+                            that.total = that.infectionTypes.length
+                            console.log(that.total)
+                            that.isLoading = false
+                        }
+                    })
+                }
+                ,
+                updInfectionType: function (InfectionType) {
+                    var InfectionType1 = JSON.parse(JSON.stringify(InfectionType));
+                    this.infectionType = {
+                        infectionTypeName: ""
+                    }
+                    this.infectionType = InfectionType1;
+                    this.InfectionTypeUpdDialogFormVisible = true
+                }
+                ,
+                addInfectionType: function () {
+
+                    this.infectionType = {
+                        infectionTypeName: ""
+                    }
+                    this.InfectionTypeAddDialogFormVisible = true;
+                }
+                ,
+                InfectionTypeAddOk: function () {
+                    if (this.infectionType.infectionTypeName == "") {
+                        this.$message({
+                            message: '请将信息填写完整',
+                            center: true,
+                            type: 'warning'
+                        });
+                        return
+                    }
+                    var that = this;
+                    $.ajax({
+                        url: this.localhost + "/admin/insInfectionType",
+                        type: "post",
+                        dataType: "JSON",
+                        data: this.infectionType,
+                        success: function (res) {
+                            that.isLoading = false
+                            if (res.flag) {
+                                that.$message({
+                                    message: '添加成功',
+                                    center: true,
+                                    type: 'success'
+                                });
+                                that.getInfectionTypes()
+                            } else {
+                                that.$message({
+                                    message: '添加失败',
+                                    center: true,
+                                    type: 'error'
+                                });
+                            }
+
+                        }
+                    })
+                    this.InfectionTypeAddDialogFormVisible = false;
+
+                }
+                ,
+                InfectionTypeAddCancel: function () {
+                    this.InfectionTypeAddDialogFormVisible = false;
+                }
+                ,
+                InfectionTypeUpdOk: function () {
+                    if (this.infectionType.infectionTypeName == "") {
+                        this.$message({
+                            message: '请将信息填写完整',
+                            center: true,
+                            type: 'warning'
+                        });
+                        return
+                    }
+                    var that = this;
+                    $.ajax({
+                        url: this.localhost + "/admin/updInfectionType",
+                        type: "post",
+                        dataType: "JSON",
+                        data: this.infectionType,
+                        success: function (res) {
+
+                            that.isLoading = false
+                            if (res.flag) {
+                                that.$message({
+                                    message: '信息修改成功',
+                                    center: true,
+                                    type: 'success'
+                                });
+                                that.getInfectionTypes()
+                            } else {
+                                that.$message({
+                                    message: '信息修改失败',
+                                    center: true,
+                                    type: 'error'
+                                });
+                            }
+
+                        }
+                    })
+                    this.InfectionTypeUpdDialogFormVisible = false;
+
+                }
+                ,
+                InfectionTypeUpdCancel: function () {
+                    this.InfectionTypeUpdDialogFormVisible = false;
+                }
+                ,
+                getOutbreakTypes: function () {
+                    var that = this;
+                    $.ajax({
+                        url: this.localhost + "/admin/findAllOutbreakTypes",
+                        type: "post",
+                        data: {},
+                        success: function (res) {
+                            that.outbreakTypes = res.outbreakTypes
+                            that.total = that.outbreakTypes.length
+                            that.isLoading = false
+                        }
+                    })
+                }
+                ,
+                updOutbreakType: function (OutbreakType) {
+                    var OutbreakType1 = JSON.parse(JSON.stringify(OutbreakType));
+                    this.outBreakType = {
+                        outBreakTypeName: ""
+                    }
+                    this.outBreakType = OutbreakType1;
+                    this.OutbreakTypeUpdDialogFormVisible = true
+                }
+                ,
+                addOutbreakType: function () {
+
+                    this.outBreakType = {
+                        outBreakTypeName: ""
+                    }
+                    this.OutbreakTypeAddDialogFormVisible = true;
+                }
+                ,
+                OutbreakTypeAddOk: function () {
+                    if (this.outBreakType.outBreakTypeName == "") {
+                        this.$message({
+                            message: '请将信息填写完整',
+                            center: true,
+                            type: 'warning'
+                        });
+                        return
+                    }
+                    var that = this;
+                    $.ajax({
+                        url: this.localhost + "/admin/insOutbreakType",
+                        type: "post",
+                        dataType: "JSON",
+                        data: this.outBreakType,
+                        success: function (res) {
+                            that.isLoading = false
+                            if (res.flag) {
+                                that.$message({
+                                    message: '添加成功',
+                                    center: true,
+                                    type: 'success'
+                                });
+                                that.getOutbreakTypes()
+                            } else {
+                                that.$message({
+                                    message: '添加失败',
+                                    center: true,
+                                    type: 'error'
+                                });
+                            }
+
+                        }
+                    })
+                    this.OutbreakTypeAddDialogFormVisible = false;
+
+                }
+                ,
+                OutbreakTypeAddCancel: function () {
+                    this.OutbreakTypeAddDialogFormVisible = false;
+                }
+                ,
+                OutbreakTypeUpdOk: function () {
+                    if (this.outBreakType.outBreakTypeName == "") {
+                        this.$message({
+                            message: '请将信息填写完整',
+                            center: true,
+                            type: 'warning'
+                        });
+                        return
+                    }
+                    var that = this;
+                    $.ajax({
+                        url: this.localhost + "/admin/updOutbreakType",
+                        type: "post",
+                        dataType: "JSON",
+                        data: this.outBreakType,
+                        success: function (res) {
+
+                            that.isLoading = false
+                            if (res.flag) {
+                                that.$message({
+                                    message: '信息修改成功',
+                                    center: true,
+                                    type: 'success'
+                                });
+                                that.getOutbreakTypes()
+                            } else {
+                                that.$message({
+                                    message: '信息修改失败',
+                                    center: true,
+                                    type: 'error'
+                                });
+                            }
+
+                        }
+                    })
+                    this.OutbreakTypeUpdDialogFormVisible = false;
+
+                }
+                ,
+                OutbreakTypeUpdCancel: function () {
+                    this.OutbreakTypeUpdDialogFormVisible = false;
+                }
+                ,
+
+                getCheckTypes: function () {
+                    var that = this;
+                    $.ajax({
+                        url: this.localhost + "/admin/findAllCheckTypes",
+                        type: "post",
+                        data: {},
+                        success: function (res) {
+                            that.CheckTypes = res.CheckTypes
+                            that.total = that.CheckTypes.length
+                            that.isLoading = false
+                        }
+                    })
+                }
+                ,
+                updCheckType: function (CheckType) {
+                    var CheckType1 = JSON.parse(JSON.stringify(CheckType));
+                    this.CheckType = {
+                        checkTypeName: ""
+                    }
+                    this.CheckType = CheckType1;
+                    this.CheckTypeUpdDialogFormVisible = true
+                }
+                ,
+                addCheckType: function () {
+
+                    this.CheckType = {
+                        checkTypeName: ""
+                    }
+                    this.CheckTypeAddDialogFormVisible = true;
+                }
+                ,
+                CheckTypeAddOk: function () {
+                    if (this.CheckType.checkTypeName == "") {
+                        this.$message({
+                            message: '请将信息填写完整',
+                            center: true,
+                            type: 'warning'
+                        });
+                        return
+                    }
+                    var that = this;
+                    $.ajax({
+                        url: this.localhost + "/admin/insCheckType",
+                        type: "post",
+                        dataType: "JSON",
+                        data: this.CheckType,
+                        success: function (res) {
+                            that.isLoading = false
+                            if (res.flag) {
+                                that.$message({
+                                    message: '添加成功',
+                                    center: true,
+                                    type: 'success'
+                                });
+                                that.getCheckTypes()
+                            } else {
+                                that.$message({
+                                    message: '添加失败',
+                                    center: true,
+                                    type: 'error'
+                                });
+                            }
+
+                        }
+                    })
+                    this.CheckTypeAddDialogFormVisible = false;
+
+                }
+                ,
+                CheckTypeAddCancel: function () {
+                    this.CheckTypeAddDialogFormVisible = false;
+                }
+                ,
+                CheckTypeUpdOk: function () {
+                    if (this.CheckType.checkTypeName == "") {
+                        this.$message({
+                            message: '请将信息填写完整',
+                            center: true,
+                            type: 'warning'
+                        });
+                        return
+                    }
+                    var that = this;
+                    $.ajax({
+                        url: this.localhost + "/admin/updCheckType",
+                        type: "post",
+                        dataType: "JSON",
+                        data: this.CheckType,
+                        success: function (res) {
+
+                            that.isLoading = false
+                            if (res.flag) {
+                                that.$message({
+                                    message: '信息修改成功',
+                                    center: true,
+                                    type: 'success'
+                                });
+                                that.getCheckTypes()
+                            } else {
+                                that.$message({
+                                    message: '信息修改失败',
+                                    center: true,
+                                    type: 'error'
+                                });
+                            }
+
+                        }
+                    })
+                    this.CheckTypeUpdDialogFormVisible = false;
+
+                }
+                ,
+                CheckTypeUpdCancel: function () {
+                    this.CheckTypeUpdDialogFormVisible = false;
+                }
+                ,
+
+                getDepartments: function () {
+                    var that = this;
+                    $.ajax({
+                        url: this.localhost + "/admin/findAllDepartments",
+                        type: "post",
+                        data: {},
+                        success: function (res) {
+                            that.Departments = res.Departments
+                            that.total = that.Departments.length
+                            that.isLoading = false
+                        }
+                    })
+                }
+                ,
+                updDepartment: function (Department) {
+                    var Department1 = JSON.parse(JSON.stringify(Department));
+                    this.Department = {
+                        departmentName: ""
+                    }
+                    this.Department = Department1;
+                    this.DepartmentUpdDialogFormVisible = true
+                }
+                ,
+                addDepartment: function () {
+
+                    this.Department = {
+                        departmentName: ""
+                    }
+                    this.DepartmentAddDialogFormVisible = true;
+                }
+                ,
+                DepartmentAddOk: function () {
+                    if (this.Department.departmentName == "") {
+                        this.$message({
+                            message: '请将信息填写完整',
+                            center: true,
+                            type: 'warning'
+                        });
+                        return
+                    }
+                    var that = this;
+                    $.ajax({
+                        url: this.localhost + "/admin/insDepartment",
+                        type: "post",
+                        dataType: "JSON",
+                        data: this.Department,
+                        success: function (res) {
+                            that.isLoading = false
+                            if (res.flag) {
+                                that.$message({
+                                    message: '添加成功',
+                                    center: true,
+                                    type: 'success'
+                                });
+                                that.getDepartments()
+                            } else {
+                                that.$message({
+                                    message: '添加失败',
+                                    center: true,
+                                    type: 'error'
+                                });
+                            }
+
+                        }
+                    })
+                    this.DepartmentAddDialogFormVisible = false;
+
+                }
+                ,
+                DepartmentAddCancel: function () {
+                    this.DepartmentAddDialogFormVisible = false;
+                }
+                ,
+                DepartmentUpdOk: function () {
+                    if (this.Department.departmentName == "") {
+                        this.$message({
+                            message: '请将信息填写完整',
+                            center: true,
+                            type: 'success'
+                        });
+                        return
+                    }
+                    var that = this;
+                    $.ajax({
+                        url: this.localhost + "/admin/updDepartment",
+                        type: "post",
+                        dataType: "JSON",
+                        data: this.Department,
+                        success: function (res) {
+
+                            that.isLoading = false
+                            if (res.flag) {
+                                that.$message({
+                                    message: '信息修改成功',
+                                    center: true,
+                                    type: 'success'
+                                });
+                                that.getDepartments()
+                            } else {
+                                that.$message({
+                                    message: '信息修改失败',
+                                    center: true,
+                                    type: 'error'
+                                });
+                            }
+
+                        }
+                    })
+                    this.DepartmentUpdDialogFormVisible = false;
+
+                }
+                ,
+                DepartmentUpdCancel: function () {
+                    this.DepartmentUpdDialogFormVisible = false;
+                }
+                ,
+
+            },
+            created: function () {
+                Date.prototype.format = function (format) {
+                    var o = {
+                        "M+": this.getMonth() + 1, //month
+                        "d+": this.getDate(), //day
+                        "h+": this.getHours(), //hour
+                        "m+": this.getMinutes(), //minute
+                        "s+": this.getSeconds(), //second
+                        "q+": Math.floor((this.getMonth() + 3) / 3), //quarter
+                        "S": this.getMilliseconds() //millisecond
+                    }
+                    if (/(y+)/.test(format)) {
+                        format = format.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+                    }
+                    for (var k in o) {
+                        if (new RegExp("(" + k + ")").test(format)) {
+                            format = format.replace(RegExp.$1, RegExp.$1.length == 1 ? o[k] : ("00" + o[k]).substr(("" + o[k]).length));
+                        }
+                    }
+                    return format;
+                }
+                this.nowDate = new Date().format("yyyy年MM月dd日 hh:mm:ss")
+                this.getDoctors()
+                var that=this
+                $.ajax({
+                    url: this.localhost + "/user/getUser",
+                    type: "post",
+                    data: {},
+                    success: function (res) {
+                        that.user = res.user
+                        $(".username-show").text(that.user.name)
+                    }
+                })
+            }
+        })
+    })
+
+</script>
+</body>
+</html>

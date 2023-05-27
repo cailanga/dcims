@@ -1,0 +1,824 @@
+<!doctype html>
+<html class="no-js" lang="zxx">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="x-ua-compatible" content="ie=edge">
+		<title>医院感染信息监测系统 </title>
+		<meta name="description" content="">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+
+		<!-- Place favicon.ico in the root Internist, General Practitonery -->
+
+		<!-- CSS here -->
+		<link rel="stylesheet" href="../../css/bootstrap.min.css">
+		<link rel="stylesheet" href="../../css/animate.min.css">
+		<link rel="stylesheet" href="../../css/magnific-popup.css">
+		<link rel="stylesheet" href="../../fontawesome/css/all.min.css">
+		<link rel="stylesheet" href="../../css/dripicons.css">
+		<link rel="stylesheet" href="../../css/slick.css">
+		<link rel="stylesheet" href="../../css/default.css">
+		<link rel="stylesheet" href="../../css/meanmenu.css">
+		<link rel="stylesheet" href="../../css/style.css">
+		<link rel="stylesheet" href="../../css/responsive.css">
+		<link rel="stylesheet" href="../../css/ionicons.min.css">
+		<link rel="stylesheet" href="../../css/font-awesome.min.css">
+		<link rel="stylesheet" href="../../css/AdminLTE.min.css">
+		<link rel="stylesheet" href="../../css/_all-skins.min.css">
+
+
+		<link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+		<script src="/js/jquery-3.3.1.min.js"></script>
+		<script src="/js/vue.min.js"></script>
+		<script src="/js/axios.js"></script>
+		<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+
+		<style type="text/css">
+			.mainMsg {
+				display: flex;
+			}
+
+			.patient {
+				width: 350px;
+				/* height: 400px; */
+				background-color: #D9E6F5;
+			}
+
+			.card-footer {
+				display: flex;
+				justify-content: space-between;
+			}
+			/* button{
+				background-color: blue;
+				border-radius: 10px;
+			} */
+
+
+			/*动画加载*/
+			.loading {
+				position: fixed;
+				left: 0;
+				top: 0;
+				/*background: url('/img/three-dots.svg') center center no-repeat #fff;*/
+				background-color: white;
+				width: 100vw;
+				height: 100vh;
+				z-index: 1000;
+				/*opacity: 0.8;*/
+			}
+
+			.main {
+            height: 100px;
+            width: 100px;
+            margin: 200px auto
+        }
+			.main div {
+				color: #799761;
+				margin: 50px auto;
+			}
+			svg {
+				fill:none
+			}
+			.load{
+				stroke-width: 15px;
+				stroke-dasharray: 252;
+				stroke-dashoffset: 0;
+				animation: load 1.5s ease-in-out infinite;
+				transform-origin: center center
+
+			}
+			.one{
+				stroke: #b8d8d7;
+			}
+			.two{
+				stroke: #73c0b0;
+				animation-delay: 0.1s;
+			}
+			.three{
+				stroke: #4d8f8e;
+				animation-delay: 0.2s
+			}
+			@keyframes load {
+				0%,100% {
+					stroke-dashoffset: 252
+				}
+				50% {
+					stroke-dashoffset: 230
+				}
+				100% {
+					transform:rotate(360deg)
+				}
+			}
+			.jump{
+				animation: jump 0.5s ease-in-out infinite
+			}
+			.first{
+				fill: #b8d8d7;
+			}
+			.second {
+				fill:#73c0b0;
+				animation-delay: 0.1s;
+			}
+			.third{
+				fill:#4d8f8e;
+				animation-delay: 0.2s;
+			}
+			@keyframes jump{
+				0% ,100%{
+					transform: translateY(0)
+				}
+				50% {
+					transform: translateY(-10px)
+				}
+			}
+			.breadcrumb-area {
+				min-height: 100px!important;
+			}
+			.second-menu .main-menu ul li:nth-child(3){
+				border-bottom: #0b3e6f 3px solid;
+			}
+		</style>
+	</head>
+	<body>
+		<!-- header -->
+		<div class="headerpage_m"></div>
+		<!-- header-end -->
+
+		<!-- main-area -->
+		<main id="dcims">
+			<div   v-if="isLoading" class="loading">
+				<div class="main">
+					<svg viewBox="0 0 120 120">
+						<circle class="load one" cx="60" cy="60" r="40"></circle>
+						<circle class="load two" cx="60" cy="60" r="40"></circle>
+						<circle class="load three" cx="60" cy="60" r="40"></circle>
+						<circle class="jump first" cx="45" cy="60" r="5"></circle>
+						<circle class="jump second" cx="60" cy="60" r="5"></circle>
+						<circle class="jump third" cx="75" cy="60" r="5"></circle>
+					</svg>
+				</div>
+			</div>
+			<!-- breadcrumb-area -->
+			<section class="breadcrumb-area d-flex align-items-center" style="background-color: #D9E6F5">
+
+				<div class="container">
+					<div  style="width: 50%;margin: 0px auto">
+						<h2 style="margin-top: 20px" align="center">智能筛查</h2>
+					</div>
+				</div>
+			</section>
+
+			<!-- shop-banner-area start -->
+			<section class="shop-banner-area pt-120 pb-90 wow fadeInUp animated" data-animation="fadeInUp animated" data-delay=".2s" style="background-color: #EDF2F6">
+				<div class="container">
+					<div class="row">
+						<div class="col-xl-7">
+							<div class="product-details-img mb-60">
+								<div class="col-lg-6 col-sm-6 text-right inline">
+									<span style="font-weight: bold; font-size: 20px;">科室：</span>
+									<select  class="form-control" style="display: inline;" v-model="departmentNo">
+										<option value="0">全部</option>
+										<option :value="item.departmentNo" v-for="item in department">{{item.departmentName}}</option>
+									</select>
+									<a class="btn btn-sm " @click="search" type="button" style="padding: 0; width: 80px;height: 42px; background-color: #D9E6F5; color: black; text-align: center;line-height: 40px; margin-left: 10px; ">查询</a>
+								</div>
+								<!-- 科室表格 -->
+								<table class="table" border="1px" style="margin-top: 20px;">
+									<!-- head -->
+									<tr>
+										<th>科室</th>
+										<th>在院</th>
+										<th>上报</th>
+										<th>疑似</th>
+										<th>确认</th>
+										<th>排除</th>
+									</tr>
+									<!-- body -->
+									<tr v-for="item in reportCardTable">
+										<td>{{item.department.departmentName}}</td>
+										<td>{{item.total}}</td>
+										<td>{{item.upCount}}</td>
+										<td>{{item.susCount}}</td>
+										<td>{{item.warnCount}}</td>
+										<td>{{item.elimiCount}}</td>
+									</tr>
+								</table>
+								<select name="orderby" class="orderby" aria-label="Shop order" v-model="status1" @change="getInfo">
+									<option value="0">查询全部</option>
+									<option value="1">查询最新报卡</option>
+								</select>
+								<!-- 病人表格 -->
+								<div class="block">
+									<el-date-picker
+											v-model="upTime"
+											type="daterange"
+											align="right"
+											unlink-panels
+											range-separator="至"
+											start-placeholder="开始日期"
+											end-placeholder="结束日期"
+											:picker-options="pickerOptions">
+									</el-date-picker>
+								</div>
+								<el-tabs type="border-card">
+									<el-tab-pane label="已预警">
+										<table width="100%" class="aim tableCard">
+											<thead>
+											<tr style="color: white;font-weight: bold;" bgcolor="#00d0f6">
+												<th>&nbsp;&nbsp;报卡编号</th>
+												<th>&nbsp;&nbsp;病人编号</th>
+												<th>&nbsp;&nbsp;病人姓名</th>
+												<th>&nbsp;&nbsp;是否处理</th>
+												<th>&nbsp;&nbsp;操作</th>
+											</tr>
+											</thead>
+											<tbody>
+											<tr v-if="handledTableData.length==0"><td colspan="7"><h4 align="center">未找到相关数据</h4></td></tr>
+											<tr v-for="item in handledTableData.slice((currentPage-1)*pagesize,currentPage*pagesize)">
+												<td>{{item.id}}</td>
+												<td>{{item.patientId}}</td>
+												<td>{{item.patientinfo.name}}</td>
+												<td>
+													<span v-if="item.handleAction==0">已排除</span>
+													<span v-else-if="item.handleAction==1">已预警</span>
+													<span v-else-if="item.handleAction==2">怀疑中</span>
+													<span v-else="item.handleAction==3">未处理</span>
+												</td>
+												<td><button @click="getWarnInfo(item)">查看</button></td>
+											</tr>
+											</tbody>
+										</table>
+									</el-tab-pane>
+									<el-tab-pane label="未处理">
+										<table width="100%" class="aim tableCard">
+											<thead>
+											<tr style="color: white;font-weight: bold;" bgcolor="#00d0f6">
+												<th>&nbsp;&nbsp;报卡编号</th>
+												<th>&nbsp;&nbsp;病人编号</th>
+												<th>&nbsp;&nbsp;病人姓名</th>
+												<th>&nbsp;&nbsp;是否处理</th>
+												<th>&nbsp;&nbsp;操作</th>
+											</tr>
+											</thead>
+											<tbody>
+											<tr v-if="no_handleTableData.length==0"><td colspan="7"><h4 align="center">未找到相关数据</h4></td></tr>
+											<tr v-for="item in no_handleTableData.slice((currentPage-1)*pagesize,currentPage*pagesize)">
+												<td>{{item.id}}</td>
+												<td>{{item.patientId}}</td>
+												<td>{{item.patientinfo.name}}</td>
+												<td>
+													<span v-if="item.handleAction==0">已排除</span>
+													<span v-else-if="item.handleAction==1">已预警</span>
+													<span v-else-if="item.handleAction==2">怀疑中</span>
+													<span v-else="item.handleAction==3">未处理</span>
+												</td>
+												<td><button @click="getWarnInfo(item)">查看</button></td>
+											</tr>
+											</tbody>
+										</table>
+									</el-tab-pane>
+									<el-tab-pane label="已排除">
+										<table width="100%" class="aim tableCard">
+											<thead>
+											<tr style="color: white;font-weight: bold;" bgcolor="#00d0f6">
+												<th>&nbsp;&nbsp;报卡编号</th>
+												<th>&nbsp;&nbsp;病人编号</th>
+												<th>&nbsp;&nbsp;病人姓名</th>
+												<th>&nbsp;&nbsp;是否处理</th>
+												<th>&nbsp;&nbsp;操作</th>
+											</tr>
+											</thead>
+											<tbody>
+											<tr v-if="elimiTableData.length==0"><td colspan="7"><h4 align="center">未找到相关数据</h4></td></tr>
+											<tr v-for="item in elimiTableData.slice((currentPage-1)*pagesize,currentPage*pagesize)">
+												<td>{{item.id}}</td>
+												<td>{{item.patientId}}</td>
+												<td>{{item.patientinfo.name}}</td>
+												<td>
+													<span v-if="item.handleAction==0">已排除</span>
+													<span v-else-if="item.handleAction==1">已预警</span>
+													<span v-else-if="item.handleAction==2">怀疑中</span>
+													<span v-else="item.handleAction==3">未处理</span>
+												</td>
+												<td><button @click="getWarnInfo(item)">查看</button></td>
+											</tr>
+											</tbody>
+										</table>
+									</el-tab-pane>
+									<el-tab-pane label="疑似中">
+										<table width="100%" class="aim tableCard">
+											<thead>
+											<tr style="color: white;font-weight: bold;" bgcolor="#00d0f6">
+												<th>&nbsp;&nbsp;报卡编号</th>
+												<th>&nbsp;&nbsp;病人编号</th>
+												<th>&nbsp;&nbsp;病人姓名</th>
+												<th>&nbsp;&nbsp;是否处理</th>
+												<th>&nbsp;&nbsp;操作</th>
+											</tr>
+											</thead>
+											<tbody>
+											<tr v-if="susTableData.length==0"><td colspan="7"><h4 align="center">未找到相关数据</h4></td></tr>
+											<tr v-for="item in susTableData.slice((currentPage-1)*pagesize,currentPage*pagesize)">
+												<td>{{item.id}}</td>
+												<td>{{item.patientId}}</td>
+												<td>{{item.patientinfo.name}}</td>
+												<td>
+													<span v-if="item.handleAction==0">已排除</span>
+													<span v-else-if="item.handleAction==1">已预警</span>
+													<span v-else-if="item.handleAction==2">怀疑中</span>
+													<span v-else="item.handleAction==3">未处理</span>
+												</td>
+												<td><button @click="getWarnInfo(item)">查看</button></td>
+											</tr>
+											</tbody>
+										</table>
+									</el-tab-pane>
+								</el-tabs>
+
+								<!-- 分页信息 -->
+								<div class="pagination-wrap mt-50 text-center">
+									<div style="text-align: center;margin-top: 30px;">
+										<el-pagination
+												:page-size="5"
+												background
+												layout="prev, pager, next"
+												:total="total"
+												@current-change="current_change">
+										</el-pagination>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-xl-5">
+							<div class="product-details mb-30">
+								<div class="patient card">
+									<div class="card-header">{{reportCardOne.patientinfo.name}}</div>
+									<div class="card-body">
+										<p><span>医生:</span><span>{{reportCardOne.mainDoctor.doctorName}}</span></p>
+										<p><span>入院时间:</span><span>{{reportCardOne.patientinfo.enterTimeStr}}</span></p>
+										<p><span>预警时间:</span><span>{{reportCardOne.warnDate||"无"}}</span></p>
+										<p><span>处理时间:</span><span>{{reportCardOne.handleDate||"无"}}</span></p>
+										<p><span>上报时间:</span><span>{{reportCardOne.upTime}}</span></p>
+										<p><span>社区感染:</span>
+											<font v-if="reportCardOne.cstatus==0" color="#0000FF">{{reportCardOne.cstatusStr}}</font>
+											<font v-else-if="reportCardOne.cstatus==1" color="#FF0000">{{reportCardOne.cstatusStr}}</font>
+										</p>
+										<p><span>床号:</span><span>{{reportCardOne.patientinfo.bedNumber}}</span></p>
+										<p><span>电话:</span><span>{{reportCardOne.patientinfo.phone}}</span></p>
+
+									</div>
+									<div class="card-footer">
+										<span>已监测手术：
+											<font v-if="reportCardOne.isOperation==0" color="#0000FF">{{reportCardOne.isOperationStr}}</font>
+											<font v-else-if="reportCardOne.isOperation==1" color="#FF0000">{{reportCardOne.isOperationStr}}</font>
+										</span>
+										<span v-if="reportCardOne.handleAction==0">已排除</span>
+										<span v-else-if="reportCardOne.handleAction==1">已预警</span>
+										<span v-else-if="reportCardOne.handleAction==2">怀疑中</span>
+										<span v-else="reportCardOne.handleAction==3">未处理</span>
+									</div>
+									<el-dialog title="排除" :visible.sync="dialogFormVisible">
+										<el-form :model="elimiData">
+											<el-form-item label="内容" :label-width="formLabelWidth">
+												<el-input v-model="elimiData.content" auto-complete="off"></el-input>
+											</el-form-item>
+											<el-form-item label="排除原因" :label-width="formLabelWidth">
+												<el-input v-model="elimiData.cause" auto-complete="off"></el-input>
+											</el-form-item>
+										</el-form>
+										<div slot="footer" class="dialog-footer">
+											<el-button @click="dialogFormVisible = false">取 消</el-button>
+											<el-button type="primary" @click="elimi">确 定</el-button>
+										</div>
+									</el-dialog>
+
+								</div>
+
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+			<!-- shop-banner-area end -->
+			<!-- product-desc-area start -->
+			<section class="product-desc-area pb-80">
+				<div class="container">
+					<div class="row">
+						<div class="col-12">
+							<div class="bakix-details-tab">
+								<ul class="nav text-center justify-content-center pb-30 mb-50" id="myTab" role="tablist">
+									<li class="nav-item">
+										<a class="nav-link active" id="desc-tab" data-toggle="tab" href="#id-desc" role="tab" aria-controls="home"
+										 aria-selected="true">预警信息 </a>
+									</li>
+									<li class="nav-item">
+										<a class="nav-link" id="id-add-in" data-toggle="tab" href="#id-add" role="tab" aria-controls="profile"
+										 aria-selected="false">基础信息</a>
+									</li>
+									<li class="nav-item">
+										<a class="nav-link" id="id-r" data-toggle="tab" href="#id-rev" role="tab" aria-controls="profile"
+										 aria-selected="false">排除信息</a>
+									</li>
+								</ul>
+							</div>
+							<div class="tab-content" id="myTabContent">
+								<div class="tab-pane fade show active" id="id-desc" role="tabpanel" aria-labelledby="desc-tab">
+									<div class="event-text mb-40">
+										<table class="table">
+											<tr>
+												<th>预警条件</th>
+												<th>预警类型</th>
+												<th>预警内容</th>
+											</tr>
+											<tr v-if="warnInfo.length==0"><td colspan="3"><h4 align="center">暂无数据</h4></td></tr>
+											<tr v-else v-for="item in warnInfo">
+												<td>{{item.warnCondition.conditionName}}</td>
+												<td>{{item.warnType.warnTypeName}}</td>
+												<td>{{item.warnContent}}</td>
+											</tr>
+										</table>
+									</div>
+								</div>
+								<div class="tab-pane fade" id="id-add" role="tabpanel" aria-labelledby="id-add-in">
+									<div class="additional-info">
+
+										<div class="table-responsive" v-if="reportCardOne==null">
+											<h4>暂无病人信息</h4>
+										</div>
+										<div v-else class="table-responsive">
+											<h4>{{reportCardOne.patientinfo.name}}</h4>
+											<table class="table">
+												<tbody>
+													<tr>
+														<th>主治医生</th>
+														<td class="product_weight">{{reportCardOne.mainDoctor.doctorName}}</td>
+													</tr>
+													<tr>
+														<th>入院诊断</th>
+														<td class="product_dimensions"><font color="blue">{{reportCardOne.diagnosisType.diagnosisTypeName}}</td>
+													</tr>
+													<tr>
+														<th>体温异常</th>
+														<td class="product_dimensions">
+															<font v-if="reportCardOne.tisNormal==0" color="blue">{{reportCardOne.tisNormalStr}}</font>
+															<font v-if="reportCardOne.tisNormal==1" color="red">{{reportCardOne.tisNormalStr}}</font>
+														</td>
+													</tr>
+													<tr>
+														<th>出院</th>
+														<td class="product_dimensions">
+															<font v-if="reportCardOne.isLeaveHospital==0" color="blue">{{reportCardOne.isLeaveHospitalStr}}</font>
+															<font v-else color="red">{{reportCardOne.isLeaveHospitalStr}}</font>
+														</td>
+													</tr>
+													<tr>
+														<th>多重耐药</th>
+														<td class="product_dimensions">
+															<font v-if="reportCardOne.isMultiMedical==0" color="blue">{{reportCardOne.isMultiMedicalStr}}</font>
+															<font v-else-if="reportCardOne.isMultiMedical==1" color="red">{{reportCardOne.isMultiMedicalStr}}</font>
+														</td>
+													</tr>
+													<tr>
+														<th>检出病原体</th>
+														<td class="product_dimensions">
+															<font v-if="reportCardOne.isCheckedPathogen==0" color="blue">{{reportCardOne.isCheckedPathogenStr}}</font>
+															<font v-else-if="reportCardOne.isCheckedPathogen==1" color="red">{{reportCardOne.isCheckedPathogenStr}}</font>
+														</td>
+													</tr>
+													<tr>
+														<th>使用抗菌药物</th>
+														<td class="product_dimensions">
+															<font v-if="reportCardOne.isUseMedical==0" color="blue">{{reportCardOne.isUseMedicalStr}}</font>
+															<font v-else-if="reportCardOne.isUseMedical==1" color="red">{{reportCardOne.isUseMedicalStr}}</font>
+														</td>
+													</tr>
+													<tr>
+														<th>病程分析：</th>
+														<td><font color="red">{{reportCardOne.courseAnalysis}}</font></td>
+													</tr>
+													<tr>
+														<th>侵入性操作</th>
+														<td class="product_dimensions">
+															<font v-if="reportCardOne.isInvade==0" color="blue">{{reportCardOne.isInvadeStr}}</font>
+															<font v-else-if="reportCardOne.isInvade==1" color="red">{{reportCardOne.isInvadeStr}}</font>
+														</td>
+													</tr>
+													<tr>
+														<th>手术</th>
+														<td class="product_dimensions">
+															<font v-if="reportCardOne.isOperation==0" color="blue">{{reportCardOne.isOperationStr}}</font>
+															<font v-if="reportCardOne.isOperation==1" color="red">{{reportCardOne.isOperationStr}}</font>
+														</td>
+													</tr>
+												</tbody>
+											</table>
+										</div>
+									</div>
+								</div>
+								<div class="tab-pane fade" id="id-rev" role="tabpanel" aria-labelledby="id-r">
+									<div class="additional-info">
+										<div class="event-text mb-40">
+											<table class="table">
+												<tr>
+													<th width="25%" style="text-align: center;">时间</th>
+													<th width="45%" style="text-align: center;">内容</th>
+													<th width="10%" style="text-align: center;">状态</th>
+													<th width="8%" style="text-align: center;">人员</th>
+													<th width="12%" style="text-align: center;">排除原因</th>
+												</tr>
+												<tr v-if="elimiInfo.length==0"><td colspan="5"><h4 align="center">暂无数据</h4></td></tr>
+												<tr v-else v-for="item in elimiInfo">
+													<td>{{item.date}}</td>
+													<td>{{item.content}}</td>
+													<td>已排除</td>
+													<td>{{item.user.name}}</td>
+													<td>{{item.cause}}</td>
+												</tr>
+											</table>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+			<!-- product-desc-area end -->
+		</main>
+		<!-- main-area-end -->
+		<!-- footer -->
+		<div class="footerpage_m"></div>
+		<!-- footer-end -->
+
+
+		<!-- JS here -->
+		<!-- JS here -->
+
+		<script src="../../js/vendor/modernizr-3.5.0.min.js"></script>
+		<script src="../../js/vendor/jquery-1.12.4.min.js"></script>
+		<script src="../../js/popper.min.js"></script>
+		<script src="../../js/bootstrap.min.js"></script>
+		<script src="../../js/one-page-nav-min.js"></script>
+		<script src="../../js/jquery.meanmenu.min.js"></script>
+		<script src="../../js/slick.min.js"></script>
+		<script src="../../js/ajax-form.js"></script>
+		<script src="../../js/paroller.js"></script>
+		<script src="../../js/wow.min.js"></script>
+		<script src="../../js/js_isotope.pkgd.min.js"></script>
+		<script src="../../js/imagesloaded.min.js"></script>
+		<script src="../../js/parallax.min.js"></script>
+		<script src="../../js/jquery.waypoints.min.js"></script>
+		<script src="../../js/jquery.counterup.min.js"></script>
+		<script src="../../js/jquery.scrollUp.min.js"></script>
+		<script src="../../js/parallax-scroll.js"></script>
+		<script src="../../js/jquery.magnific-popup.min.js"></script>
+		<script src="../../js/element-in-view.js"></script>
+		<script src="../../js/main.js"></script>
+		<script>
+			$(function() {
+				//调用公共代码
+				$('.footerpage_m').load('/commons/footer.html');
+				$('.headerpage_m').load('/commons/header.html');
+
+				$(".exit").click(function logout() {
+					$.ajax({
+						type: "post",
+						url: "/logout",
+						dataType:"json",
+						data: {
+
+						},
+						success: function (res) {
+							if(res.code==200){
+								window.location.href="http://192.168.150.130:8089/pages/login.html";
+							}else{
+								alert("退出失败")
+							}
+						}
+					})
+				})
+
+				new Vue({
+					el:"#dcims",
+					data:{
+						localhost:"http://192.168.150.130:8089",
+						total:0,
+						pagesize:5,
+						currentPage:1,
+						departmentNo:0,
+						patientId:0,
+						reportCardTable:[],
+						reportCard:[],
+						no_handleTableData:[],
+						elimiTableData:[],
+						handledTableData:[],
+						susTableData:[],
+						warnConditions:[],
+						department:{},
+						reportCardOne:{},
+						warnInfo:[],
+						elimiInfo:[],
+						formLabelWidth:"120px",
+						dialogFormVisible:false,
+						elimiData:{
+							cause:"",
+							content:""
+						},
+						pickerOptions: {
+							shortcuts: [{
+								text: '最近一周',
+								onClick(picker) {
+									const end = new Date();
+									const start = new Date();
+									start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+									picker.$emit('pick', [start, end]);
+								}
+							}, {
+								text: '最近一个月',
+								onClick(picker) {
+									const end = new Date();
+									const start = new Date();
+									start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+									picker.$emit('pick', [start, end]);
+								}
+							}, {
+								text: '最近三个月',
+								onClick(picker) {
+									const end = new Date();
+									const start = new Date();
+									start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+									picker.$emit('pick', [start, end]);
+								}
+							}],
+						},
+						upTime:"",
+						startDate:"",
+						endDate:"",
+						status1:1,
+						user:{},
+						nowDate:"",
+						isLoading: true
+					},
+					methods:{
+						getInfo:function () {
+							var that=this;
+							that.elimiTableData=[]
+							that.handledTableData=[]
+							that.no_handleTableData=[]
+							that.susTableData=[]
+							if (this.upTime.length == 2) {
+								this.startDate = this.upTime[0].format("yyyy-MM-dd");
+								this.endDate = this.upTime[1].format("yyyy-MM-dd");
+							}
+
+							$.ajax({
+								url: this.localhost+"/user/findReportCard",
+								type:"post",
+								data:{
+									departmentNo:this.departmentNo,
+									startDate:this.startDate,
+									endDate:this.endDate,
+									status:this.status1
+								},
+								success:function (res) {
+									that.elimiTableData=[]
+									that.handledTableData=[]
+									that.no_handleTableData=[]
+									that.susTableData=[]
+									that.user=res.user
+									$(".username-show").text(that.user.name)
+									that.warnConditions=res.warnConditions;
+									that.reportCard=res.reportCard
+
+
+									that.warnInfo=res.warnInfo
+									that.elimiInfo=res.elimiInfo
+									that.reportCardTable=res.reportTable
+									that.department=res.department
+									for(var i=0;i<that.reportCard.length;i++){
+										var item=that.reportCard[i]
+										console.log(item)
+										if(item.handleAction==0){
+											that.elimiTableData.push(item)
+										}else if (item.handleAction==1) {
+											that.handledTableData.push(item)
+										}else if (item.handleAction==2) {
+											that.susTableData.push(item)
+										}else{
+											that.no_handleTableData.push(item)
+										}
+									}
+									that.reportCardOne=that.reportCard[0]
+									that.getWarnInfo(that.reportCardOne)
+									that.isLoading=false
+								}
+							})
+						},
+						search:function () {
+							this.getInfo()
+						},
+						getWarnInfo:function (item) {
+							var that=this;
+							console.log(item)
+							this.reportCardOne=item
+							$.ajax({
+								url: this.localhost+"/user/findWarnInfo",
+								type:"post",
+								data:{
+									reportCardId:item.id
+								},
+								success:function (res) {
+									console.log(res)
+									that.warnInfo=res.warnInfo
+									that.elimiInfo=res.elimiInfo
+								}
+							})
+						},
+						handle:function () {
+							var that=this;
+							$.ajax({
+								url: this.localhost+"/user/handle",
+								type:"post",
+								data:{
+									id:this.reportCardOne.id,
+									handleAction:1
+								},
+								success:function (res) {
+									console.log(res)
+									if(res){
+										that.getInfo()
+									}
+								}
+							})
+						},
+						elimi:function () {
+							this.dialogFormVisible=false;
+							var that=this;
+							$.ajax({
+								url: this.localhost+"/user/eliminateWarn",
+								type:"post",
+								data:{
+									patientId:this.reportCardOne.patientId,
+									content:this.elimiData.content,
+									cause:this.elimiData.cause,
+									reportCardId:this.reportCardOne.id,
+									doctorNo:this.reportCardOne.mainDoctor.doctorNo,
+									userId:this.user.id
+								},
+								success:function (res) {
+									console.log(res)
+									if(res){
+										that.getInfo()
+									}
+								}
+							})
+						},
+						current_change:function(currentPage){
+							this.currentPage = currentPage;
+						},
+						logout:function () {
+							$.ajax({
+								type: "post",
+								url:  this.localhost+"/logout",
+								dataType:"json",
+								data: {
+
+								},
+								success: function (res) {
+									if(res.code==200){
+										window.location.href="http://192.168.150.130:8089/pages/login.html";
+									}else{
+										alert("退出失败")
+									}
+								}
+							})
+						}
+					},
+					created:function () {
+						Date.prototype.format = function(format){
+							var o = {
+								"M+" : this.getMonth()+1, //month
+								"d+" : this.getDate(), //day
+								"h+" : this.getHours(), //hour
+								"m+" : this.getMinutes(), //minute
+								"s+" : this.getSeconds(), //second
+								"q+" : Math.floor((this.getMonth()+3)/3), //quarter
+								"S" : this.getMilliseconds() //millisecond
+							}
+							if(/(y+)/.test(format)) {
+								format = format.replace(RegExp.$1, (this.getFullYear()+"").substr(4 - RegExp.$1.length));
+							}
+							for(var k in o) {
+								if(new RegExp("("+ k +")").test(format)) {
+									format = format.replace(RegExp.$1, RegExp.$1.length==1 ? o[k] : ("00"+ o[k]).substr((""+ o[k]).length));
+								}
+							}
+							return format;
+						}
+						this.nowDate=new Date().format("yyyy年MM月dd日 hh:mm:ss")
+						this.getInfo()
+					}
+				})
+			})
+		</script>
+	</body>
+</html>

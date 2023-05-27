@@ -1,0 +1,368 @@
+<!doctype html>
+<html class="no-js" lang="zxx">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="x-ua-compatible" content="ie=edge">
+		<title>医院感染信息监测系统 </title>
+		<meta name="description" content="">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<!-- Place favicon.ico in the root Internist, General Practitonery -->
+		<!-- CSS here -->
+		<link rel="stylesheet" href="../../css/bootstrap.min.css">
+		<link rel="stylesheet" href="../../css/animate.min.css">
+		<link rel="stylesheet" href="../../css/magnific-popup.css">
+		<link rel="stylesheet" href="../../fontawesome/css/all.min.css">
+		<link rel="stylesheet" href="../../css/dripicons.css">
+		<link rel="stylesheet" href="../../css/slick.css">
+		<link rel="stylesheet" href="../../css/default.css">
+		<link rel="stylesheet" href="../../css/meanmenu.css">
+		<link rel="stylesheet" href="../../css/style.css">
+		<link rel="stylesheet" href="../../css/responsive.css">
+
+		<link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+		<script src="/js/jquery-3.3.1.min.js"></script>
+		<script src="/js/vue.min.js"></script>
+		<script src="/js/axios.js"></script>
+		<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+
+
+
+		<style type="text/css">
+			.product_weight {
+				width: 10px;
+			}
+			.inpatient{
+				margin-left: 10px;
+				margin-bottom: 10px;
+			}
+			.table-list{
+				border: 1px solid black;
+			}
+			.table-list tr td,.table-list tr th{
+				width: auto;
+				padding: 0;
+			}
+			/*动画加载*/
+			.loading {
+				position: fixed;
+				left: 0;
+				top: 0;
+				/*background: url('/img/three-dots.svg') center center no-repeat #fff;*/
+				background-color: white;
+				width: 100vw;
+				height: 100vh;
+				z-index: 1000;
+				/*opacity: 0.8;*/
+			}
+
+			.main {
+            height: 100px;
+            width: 100px;
+            margin: 200px auto
+        }
+			.main div {
+				color: #799761;
+				margin: 50px auto;
+			}
+			svg {
+				fill:none
+			}
+			.load{
+				stroke-width: 15px;
+				stroke-dasharray: 252;
+				stroke-dashoffset: 0;
+				animation: load 1.5s ease-in-out infinite;
+				transform-origin: center center
+
+			}
+			.one{
+				stroke: #b8d8d7;
+			}
+			.two{
+				stroke: #73c0b0;
+				animation-delay: 0.1s;
+			}
+			.three{
+				stroke: #4d8f8e;
+				animation-delay: 0.2s
+			}
+			@keyframes load {
+				0%,100% {
+					stroke-dashoffset: 252
+				}
+				50% {
+					stroke-dashoffset: 230
+				}
+				100% {
+					transform:rotate(360deg)
+				}
+			}
+			.jump{
+				animation: jump 0.5s ease-in-out infinite
+			}
+			.first{
+				fill: #b8d8d7;
+			}
+			.second {
+				fill:#73c0b0;
+				animation-delay: 0.1s;
+			}
+			.third{
+				fill:#4d8f8e;
+				animation-delay: 0.2s;
+			}
+			@keyframes jump{
+				0% ,100%{
+					transform: translateY(0)
+				}
+				50% {
+					transform: translateY(-10px)
+				}
+			}
+
+			.second-menu .main-menu ul li:nth-child(2){
+				border-bottom: #0b3e6f 3px solid;
+			}
+
+		</style>
+	</head>
+	<body>
+		<!-- header -->
+		<div class="headerpage_m"></div>
+		<!-- header-end -->
+		<!-- main-area -->
+		<main>
+			<!-- breadcrumb-area -->
+			<section class="breadcrumb-area d-flex align-items-center" style="background-image:url(../../img/testimonial/test-bg.jpg)">
+				<div class="container">
+					<div class="row">
+						<div class="col-xl-6 offset-xl-3 col-lg-8 offset-lg-2">
+							<div class="breadcrumb-wrap text-center">
+								<div class="breadcrumb-title mb-30">
+									<h2>病区概况</h2>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+			<!-- breadcrumb-area-end -->
+			<!-- department-area -->
+			<section class="department-area cta-bg pb-70 pt-100 fix" style="background-image:url(../../img/an-bg/an-bg05.png); background-size: contain;background-color: #EDF2F6">
+				<div class="container" id="dcims">
+					<div   v-if="isLoading" class="loading">
+						<div class="main">
+							<svg viewBox="0 0 120 120">
+								<circle class="load one" cx="60" cy="60" r="40"></circle>
+								<circle class="load two" cx="60" cy="60" r="40"></circle>
+								<circle class="load three" cx="60" cy="60" r="40"></circle>
+								<circle class="jump first" cx="45" cy="60" r="5"></circle>
+								<circle class="jump second" cx="60" cy="60" r="5"></circle>
+								<circle class="jump third" cx="75" cy="60" r="5"></circle>
+							</svg>
+						</div>
+					</div>
+					<div class="row align-items-lg-start">
+						<div class="col-lg-4">
+							<table class="table table-info table-striped table-list">
+								<tr>
+									<th style="text-align: center;" colspan="2">体征信息</th>
+								</tr>
+								<tr v-for="item in tizheng">
+									<td>&nbsp;&nbsp;{{item.infoName}}：</td>
+									<td class="product_weight">{{item.count}}人</td>
+								</tr>
+
+								<tr>
+									<th style="text-align: center;" colspan="2">微生物信息</th>
+								</tr>
+								<tr v-for="item in shengwu">
+									<td>&nbsp;&nbsp;{{item.infoName}}：</td>
+									<td>{{item.count}}人</td>
+								</tr>
+
+								<tr>
+									<th style="text-align: center;" colspan="2">手术信息</th>
+								</tr>
+								<tr v-for="item in operation">
+									<td style="border-bottom: 1px solid #000000;">&nbsp;&nbsp;{{item.infoName}}：</td>
+									<td style="border-bottom: 1px solid #000000;">{{item.count}}人</td>
+								</tr>
+							</table>
+						</div>
+						<div class="col-lg-8">
+								<div class="card inpatient" style="display: inline-block;" v-for="(item,index) in departmentBQ">
+									<div class="card-header">{{item.department.departmentName}}</div>
+									<div class="card-body">
+										<table class="table table-striped" >
+											<tr>
+												<th>侵入性操作</th>
+												<td>{{item.list[0].count}}人</td>
+												<th>送检病人</th>
+												<td>{{item.list[1].count}}人</td>
+											</tr>
+											<tr>
+												<th>手术病人</th>
+												<td>{{item.list[2].count}}人</td>
+												<th>体温异常</th>
+												<td>{{item.list[3].count}}人</td>
+											</tr>
+											<tr>
+												<th>使用抗菌药物</th>
+												<td>{{item.list[4].count}}人</td>
+												<th>多重耐药</th>
+												<td>{{item.list[5].count}}人</td>
+											</tr>
+											<tr>
+												<th>白细胞</th>
+												<td>{{item.list[6].count}}人</td>
+												<th>中性粒细胞</th>
+												<td>{{item.list[7].count}}人</td>
+											</tr>
+											<tr>
+												<th>C反应蛋白</th>
+												<td>{{item.list[8].count}}人</td>
+												<th>降钙素原</th>
+												<td>{{item.list[9].count}}人</td>
+											</tr>
+										</table>
+									</div>
+								</div>
+						</div>
+					</div>
+				</div>
+			</section>
+			<!-- department-area-end -->
+
+		</main>
+		<!-- main-area-end -->
+		<!-- footer -->
+
+		<!-- footer-end -->
+		<div class="footerpage_m"></div>
+
+		<!-- JS here -->
+		<!-- JS here -->
+		<script src="../../js/vendor/modernizr-3.5.0.min.js"></script>
+		<script src="../../js/vendor/jquery-1.12.4.min.js"></script>
+		<script src="../../js/popper.min.js"></script>
+		<script src="../../js/bootstrap.min.js"></script>
+		<script src="../../js/one-page-nav-min.js"></script>
+		<script src="../../js/jquery.meanmenu.min.js"></script>
+		<script src="../../js/slick.min.js"></script>
+		<script src="../../js/ajax-form.js"></script>
+		<script src="../../js/paroller.js"></script>
+		<script src="../../js/wow.min.js"></script>
+		<script src="../../js/js_isotope.pkgd.min.js"></script>
+		<script src="../../js/imagesloaded.min.js"></script>
+		<script src="../../js/parallax.min.js"></script>
+		<script src="../../js/jquery.waypoints.min.js"></script>
+		<script src="../../js/jquery.counterup.min.js"></script>
+		<script src="../../js/jquery.scrollUp.min.js"></script>
+		<script src="../../js/parallax-scroll.js"></script>
+		<script src="../../js/jquery.magnific-popup.min.js"></script>
+		<script src="../../js/element-in-view.js"></script>
+		<script src="../../js/main.js"></script>
+		<script>
+			$(function() {
+				//调用公共代码
+				$('.footerpage_m').load('/commons/footer.html');
+				$('.headerpage_m').load('/commons/header.html');
+
+				$(".exit").click(function logout() {
+					$.ajax({
+						type: "post",
+						url: "/logout",
+						dataType:"json",
+						data: {
+
+						},
+						success: function (res) {
+							if(res.code==200){
+								window.location.href="http://192.168.150.130:8089/pages/login.html";
+							}else{
+								alert("退出失败")
+							}
+						}
+					})
+				})
+
+
+				new Vue({
+					el:"#dcims",
+					data:{
+						localhost:"http://192.168.150.130:8089",
+						tizheng:[],
+						shengwu:[],
+						operation:[],
+						departmentBQ:[],
+						user:{},
+						nowDate:"",
+						isLoading: true
+					},
+					methods:{
+						getInfo:function () {
+							var that=this;
+							$.ajax({
+								url:this.localhost+"/user/bingqugaikuang",
+								type:"post",
+								data:{},
+								success:function (res) {
+									console.log(res)
+									that.tizheng=res.TiZheng;
+									that.shengwu=res.ShengWu
+									that.operation=res.operation
+									that.departmentBQ=res.departmentBQs
+									that.user=res.user
+									$(".username-show").text(that.user.name)
+									that.isLoading=false
+								}
+							})
+						},
+						logout:function () {
+							$.ajax({
+								type: "post",
+								url: this.localhost+"/logout",
+								dataType:"json",
+								data: {
+
+								},
+								success: function (res) {
+									if(res.code==200){
+										window.location.href="http://192.168.150.130:8089/pages/login.html";
+									}else{
+										alert("退出失败")
+									}
+								}
+							})
+						}
+					},
+					created:function () {
+						Date.prototype.format = function(format){
+							var o = {
+								"M+" : this.getMonth()+1, //month
+								"d+" : this.getDate(), //day
+								"h+" : this.getHours(), //hour
+								"m+" : this.getMinutes(), //minute
+								"s+" : this.getSeconds(), //second
+								"q+" : Math.floor((this.getMonth()+3)/3), //quarter
+								"S" : this.getMilliseconds() //millisecond
+							}
+							if(/(y+)/.test(format)) {
+								format = format.replace(RegExp.$1, (this.getFullYear()+"").substr(4 - RegExp.$1.length));
+							}
+							for(var k in o) {
+								if(new RegExp("("+ k +")").test(format)) {
+									format = format.replace(RegExp.$1, RegExp.$1.length==1 ? o[k] : ("00"+ o[k]).substr((""+ o[k]).length));
+								}
+							}
+							return format;
+						}
+						this.nowDate=new Date().format("yyyy年MM月dd日 hh:mm:ss")
+						this.getInfo()
+					}
+				})
+			})
+		</script>
+	</body>
+</html>
